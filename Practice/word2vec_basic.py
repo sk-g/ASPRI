@@ -52,7 +52,7 @@ def maybe_download(filename, expected_bytes):
 
 
 #filename = maybe_download('text8.zip', 31344016)
-filename = maybe_download('initial_data_2.zip',4058291)
+filename = maybe_download('preprocessed_data_without_protocol.zip',4058291)
 
 # Read the data into a list of strings.
 def read_data(filename):
@@ -192,7 +192,8 @@ with graph.as_default():
 	optimizer = tf.train.AdamOptimizer(1e-4).minimize(loss)
 
 	# Compute the cosine similarity between minibatch examples and all embeddings.
-	norm = tf.sqrt(tf.reduce_sum(tf.square(embeddings), 1, keep_dims=True))
+	norm = tf.sqrt(tf.reduce_sum(tf.square(embeddings),
+	 1, keepdims=True)) #keep_dims is deprecated use keepdims instead
 	normalized_embeddings = embeddings / norm
 	valid_embeddings = tf.nn.embedding_lookup(
 			normalized_embeddings, valid_dataset)
@@ -203,7 +204,7 @@ with graph.as_default():
 	init = tf.global_variables_initializer()
 
 # Step 5: Begin training.
-num_steps = 1000#01
+num_steps = 3000
 
 with tf.Session(graph=graph) as session:
 	# We must initialize all variables before we use them.
@@ -221,19 +222,19 @@ with tf.Session(graph=graph) as session:
 		_, loss_val = session.run([optimizer, loss], feed_dict=feed_dict)
 		average_loss += loss_val
 
-		if step % 200 == 0:
+		if step % 1000 == 0:
 			if step > 0:
-				average_loss /= 200
+				average_loss /= 1000
 			# The average loss is an estimate of the loss over the last 2000 batches.
 			print('Average loss at step ', step, ': ', average_loss)
 			average_loss = 0
 
 		# Note that this is expensive (~20% slowdown if computed every 500 steps)
-		if step % 500 == 0:#10000 == 0:
+		if step % 10000 == 0: #500 == 0:#
 			sim = similarity.eval()
 			for i in xrange(valid_size):
 				valid_word = reverse_dictionary[valid_examples[i]]
-				top_k = 8  # number of nearest neighbors
+				top_k = 4#8  # number of nearest neighbors
 				nearest = (-sim[i, :]).argsort()[1:top_k + 1]
 				log_str = 'Nearest to %s:' % valid_word
 				for k in xrange(top_k):
