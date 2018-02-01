@@ -29,7 +29,7 @@ import numpy as np
 from six.moves import urllib
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
-
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # Step 1: Download the data.
 url = 'http://mattmahoney.net/dc/'
 
@@ -37,22 +37,22 @@ url = 'http://mattmahoney.net/dc/'
 # pylint: disable=redefined-outer-name
 def maybe_download(filename, expected_bytes):
 	"""Download a file if not present, and make sure it's the right size."""
-	local_filename = os.path.join(gettempdir(), filename)
+	local_filename = os.path.join(os.getcwd(), filename)
 	if not os.path.exists(local_filename):
 		local_filename, _ = urllib.request.urlretrieve(url + filename,
 																									 local_filename)
-	statinfo = os.stat(local_filename)
-	if statinfo.st_size == expected_bytes:
-		print('Found and verified', filename)
-	else:
-		print(statinfo.st_size)
-		raise Exception('Failed to verify ' + local_filename +
-										'. Can you get to it with a browser?')
+	#statinfo = os.stat(local_filename)
+	#if statinfo.st_size == expected_bytes:
+	#	print('Found and verified', filename)
+	#else:
+	#	print(statinfo.st_size)
+	#	raise Exception('Failed to verify ' + local_filename +
+	#									'. Can you get to it with a browser?')
 	return local_filename
 
 
 #filename = maybe_download('text8.zip', 31344016)
-filename = maybe_download('tex9.zip',4058291)
+filename = maybe_download('initial_data_2.zip',4058291)
 
 # Read the data into a list of strings.
 def read_data(filename):
@@ -92,8 +92,7 @@ def build_dataset(words, n_words):
 # count - map of words(strings) to count of occurrences
 # dictionary - map of words(strings) to their codes(integers)
 # reverse_dictionary - maps codes(integers) to words(strings)
-data, count, dictionary, reverse_dictionary = build_dataset(vocabulary,
-																														vocabulary_size)
+data, count, dictionary, reverse_dictionary = build_dataset(vocabulary,vocabulary_size)
 del vocabulary  # Hint to reduce memory.
 print('Most common words (+UNK)', count[:5])
 print('Sample data', data[:10], [reverse_dictionary[i] for i in data[:10]])
@@ -187,7 +186,10 @@ with graph.as_default():
 										 num_classes=vocabulary_size))
 
 	# Construct the SGD optimizer using a learning rate of 1.0.
-	optimizer = tf.train.GradientDescentOptimizer(1.0).minimize(loss)
+	#optimizer = tf.train.GradientDescentOptimizer(1.0).minimize(loss)
+
+	# What if we use AdamOptimizer
+	optimizer = tf.train.AdamOptimizer(1e-4).minimize(loss)
 
 	# Compute the cosine similarity between minibatch examples and all embeddings.
 	norm = tf.sqrt(tf.reduce_sum(tf.square(embeddings), 1, keep_dims=True))
@@ -201,7 +203,7 @@ with graph.as_default():
 	init = tf.global_variables_initializer()
 
 # Step 5: Begin training.
-num_steps = 100001
+num_steps = 1000#01
 
 with tf.Session(graph=graph) as session:
 	# We must initialize all variables before we use them.
@@ -219,15 +221,15 @@ with tf.Session(graph=graph) as session:
 		_, loss_val = session.run([optimizer, loss], feed_dict=feed_dict)
 		average_loss += loss_val
 
-		if step % 2000 == 0:
+		if step % 200 == 0:
 			if step > 0:
-				average_loss /= 2000
+				average_loss /= 200
 			# The average loss is an estimate of the loss over the last 2000 batches.
 			print('Average loss at step ', step, ': ', average_loss)
 			average_loss = 0
 
 		# Note that this is expensive (~20% slowdown if computed every 500 steps)
-		if step % 10000 == 0:
+		if step % 500 == 0:#10000 == 0:
 			sim = similarity.eval()
 			for i in xrange(valid_size):
 				valid_word = reverse_dictionary[valid_examples[i]]
@@ -239,7 +241,15 @@ with tf.Session(graph=graph) as session:
 					log_str = '%s %s,' % (log_str, close_word)
 				print(log_str)
 	final_embeddings = normalized_embeddings.eval()
-
+	"""
+	import sys
+				sys.stdout = open(filename+"final_embeddings_2.txt",'w+')
+				for i in range(len(final_embeddings)):
+					print(final_embeddings[i])
+				#f = open("final_embeddings.txt",'w+')
+				#f.write(final_embeddings)
+				sys.stdout = sys.__stdout__
+	"""
 # Step 6: Visualize the embeddings.
 
 
@@ -269,7 +279,7 @@ try:
 	plot_only = 500
 	low_dim_embs = tsne.fit_transform(final_embeddings[:plot_only, :])
 	labels = [reverse_dictionary[i] for i in xrange(plot_only)]
-	plot_with_labels(low_dim_embs, labels, os.path.join(gettempdir(), 'tsne.png'))
+	plot_with_labels(low_dim_embs, labels, os.path.join(os.getcwd(), str(filename+"_AdamOptimizer.png")))
 
 except ImportError as ex:
 	print('Please install sklearn, matplotlib, and scipy to show embeddings.')
