@@ -135,8 +135,8 @@ for i in range(8):
 
 # Step 4: Build and train a skip-gram model.
 
-batch_size = 128
-embedding_size = 128  # Dimension of the embedding vector.
+batch_size = 256
+embedding_size = 512  # Dimension of the embedding vector.
 skip_window = 1       # How many words to consider left and right.
 num_skips = 2         # How many times to reuse an input to generate a label.
 num_sampled = 64      # Number of negative examples to sample.
@@ -204,7 +204,7 @@ with graph.as_default():
 	init = tf.global_variables_initializer()
 
 # Step 5: Begin training.
-num_steps = 3000
+num_steps = 30000
 
 with tf.Session(graph=graph) as session:
 	# We must initialize all variables before we use them.
