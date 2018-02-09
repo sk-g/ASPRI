@@ -120,7 +120,8 @@ def main(strx):
 		#prefix, next_hop,path,protocol = obj.counters() #fixed to call within writer block
 		obj.writer()
 		#print("\n",len(prefix),len(next_hop),len(path),len(protocol))
-os.chdir(r"M:\Course stuff\ASPRI\data\PCH\ipv4 snapshots")
+#os.chdir(r"M:\Course stuff\ASPRI\data\PCH\ipv4 snapshots")
+os.chdir('./ipv4 snapshots')
 files = os.listdir()
 for file in files:
 	if os.path.splitext(file)[1].strip() != str('.py') and os.path.splitext(file)[1].strip() != '.txt':
