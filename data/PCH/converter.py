@@ -75,7 +75,7 @@ class converter(object):
 				self.protocols.append(splits[-1])
 				itercounter += 1
 				#print("in dot counter 2, number of prefixes =",prefix_counter)
-				self.drawProgressBar(itercounter/len(self._content))
+				#self.drawProgressBar(itercounter/len(self._content))
 			if dot_counter == 1:
 				#prefix_counter += 1
 				self.prefixes.append(current_prefix)
@@ -84,8 +84,9 @@ class converter(object):
 						c+=1
 					if split.count('.') != 0:
 						self.next_hop = split
-						#print(split)
-						#print("this is the next_hop:\t",split)
+						#if split.count('/') != 0:
+						#	#print(split)
+						#	print("this is the next_hop:\t",split)
 					if c != 1 and split.count('.') == 0 and len(split)>1:
 						path_.append(split)
 				self.path = " ".join([i for i in path_])
@@ -94,9 +95,9 @@ class converter(object):
 				self.paths.append(self.path)
 				self.protocols.append(splits[-1])
 				itercounter += 1
-				self.drawProgressBar(itercounter/len(self._content))
+				#self.drawProgressBar(itercounter/len(self._content))
 		#print("in dot counter = 1, number of prefixes =",prefix_counter)				
-		print(len(self.prefixes),len(self.next_hops),len(self.paths),len(self.protocols))
+		#print(len(self.prefixes),len(self.next_hops),len(self.paths),len(self.protocols))
 		return (self.prefixes,self.next_hops,self.paths,self.protocols)
 	def writer(self):
 		if len(self.prefixes) != 0:
@@ -122,11 +123,11 @@ def main(strx):
 		#print("\n",len(prefix),len(next_hop),len(path),len(protocol))
 #os.chdir(r"M:\Course stuff\ASPRI\data\PCH\ipv4 snapshots")
 os.chdir('./ipv4 snapshots')
-files = os.listdir()
-for file in files:
-	if os.path.splitext(file)[1].strip() != str('.py') and os.path.splitext(file)[1].strip() != '.txt':
+#files = os.listdir()
+#for file in files:
+#	if os.path.splitext(file)[1].strip() != str('.py') and os.path.splitext(file)[1].strip() != '.txt':
 		#print(os.path.splitext(file)[1])
-		main(file)
+#		main(file)
 
 #temp testing
-#main(r"M:\Course stuff\ASPRI\data\PCH\ipv4 snapshots\route-collector.abj.pch.net-ipv4_bgp_routes.2017.11.30")
+main(r"M:\Course stuff\ASPRI\data\PCH\ipv4 snapshots\route-collector.vie.pch.net-ipv4_bgp_routes.2018.01.11")

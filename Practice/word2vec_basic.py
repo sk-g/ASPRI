@@ -52,7 +52,7 @@ def maybe_download(filename, expected_bytes):
 
 
 #filename = maybe_download('text8.zip', 31344016)
-filename = maybe_download('preprocessed_data_without_protocol.zip',4058291)
+filename = maybe_download('paths.zip',4058291)
 
 # Read the data into a list of strings.
 def read_data(filename):
