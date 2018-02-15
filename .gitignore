@@ -1,2 +1,4 @@
 *.gz
 *.28.ipynb_checkpoints
+'/data/ipv4 snapshots'
+'/data/ipv6 snapshots'
