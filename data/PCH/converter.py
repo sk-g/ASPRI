@@ -84,9 +84,9 @@ class converter(object):
 						c+=1
 					if split.count('.') != 0:
 						self.next_hop = split
-						#if split.count('/') != 0:
-						#	#print(split)
-						#	print("this is the next_hop:\t",split)
+						if split.count('/') != 0:
+							#print(split)
+							print("this is the next_hop:\t",split)
 					if c != 1 and split.count('.') == 0 and len(split)>1:
 						path_.append(split)
 				self.path = " ".join([i for i in path_])
@@ -130,4 +130,4 @@ os.chdir('./ipv4 snapshots')
 #		main(file)
 
 #temp testing
-main(r"M:\Course stuff\ASPRI\data\PCH\ipv4 snapshots\route-collector.vie.pch.net-ipv4_bgp_routes.2018.01.11")
+main(r"M:\Course stuff\ASPRI\data\PCH\ipv4 snapshots\route-collector.sea.pch.net-ipv4_bgp_routes.2018.01.24")#route-collector.vie.pch.net-ipv4_bgp_routes.2018.01.11")
