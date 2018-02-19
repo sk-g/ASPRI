@@ -1,6 +1,6 @@
 import tensorflow as tf
 from tensorflow.contrib import rnn
-import os,re
+import os,re,time,sys
 import numpy as np
 import pandas as pd
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -111,16 +111,12 @@ def reset_graph():
 
 def build_graph(
     vocab_size = vocab_size,
-    state_size = 24,
+    state_size = 30,
     batch_size = 189,
     num_classes = 2):
 
     reset_graph()
-    
-    # can try using GRU, LSTM, basicLSTM and stacked LSTM.
-    # currently using only GRU
-    # maybe later we run all to get a comparision?
-    
+
     # Placeholders
     x = tf.placeholder(tf.int32, [batch_size, None]) # [batch_size, num_steps]
     seqlen = tf.placeholder(tf.int32, [batch_size])
@@ -136,7 +132,7 @@ def build_graph(
     #cell = tf.nn.rnn_cell.BasicLSTMCell(state_size,forget_bias = 1)
     #cell = tf.contrib.rnn.LSTMCell(state_size,forget_bias = 1)
     init_state = tf.get_variable('init_state', [1, state_size],
-                                 initializer=tf.constant_initializer(0.0))
+                                 initializer=tf.glorot_uniform_initializer(seed = 10, dtype = tf.float32))
     init_state = tf.tile(init_state, [batch_size, 1])
     rnn_outputs, final_state = tf.nn.dynamic_rnn(cell, rnn_inputs,dtype=tf.float32)#, sequence_length=seqlen,initial_state=init_state)
 
@@ -159,7 +155,7 @@ def build_graph(
     # Softmax layer
     with tf.variable_scope('softmax'):
         W = tf.get_variable('W', [state_size, num_classes])
-        b = tf.get_variable('b', [num_classes], initializer=tf.constant_initializer(0.0))
+        b = tf.get_variable('b', [num_classes], initializer=tf.glorot_uniform_initializer(seed = 10, dtype = tf.float32))
     logits = tf.matmul(last_rnn_output, W) + b
     preds = tf.nn.softmax(logits)
     correct = tf.equal(tf.cast(tf.argmax(preds,1),tf.int32), y)
@@ -168,15 +164,11 @@ def build_graph(
     #decayed learning rate
     global_step = tf.Variable(0, trainable=False)
     starter_learning_rate = 0.1
-    learning_rate = tf.train.natural_exp_decay(starter_learning_rate, global_step,5, 0.99, staircase=False)
+    learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step,5, 0.63, staircase = False)
     loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits = logits, labels = y))
-    train_step = (tf.train.AdamOptimizer(learning_rate).minimize(loss,global_step = global_step)) 
-                # include the global step in the optimizer op
-                # so that global step increments for each epoch
-    
-    # op to print current learning rate. Sanity check, important!
+    #train_step = (tf.train.AdamOptimizer(learning_rate).minimize(loss,global_step = global_step))
+    train_step = tf.train.AdamOptimizer(1e-2).minimize(loss)
     lr_print = tf.Print(learning_rate,[learning_rate])
-    
     return {
         'x': x,
         'seqlen': seqlen,
@@ -188,15 +180,9 @@ def build_graph(
         'accuracy': accuracy,
         'lr_print': lr_print
     }
-def train_graph(graph, sess, batch_size = 1024, num_epochs = 1000, iterator = PaddedDataIterator):
+def train_graph(graph, sess, batch_size = 1024, num_epochs = 100, iterator = PaddedDataIterator):
 
-    # can test multiple times on the test data without incurring
-    # losses into the graph
-    # obviously makes it longer to run the code
-    # good policy: don't peek at test set, test only once
-    # but, here we want to get test accs
-    # so we can get bias vs tradiance :)
-    
+    start = time.time()
     sess.run(tf.global_variables_initializer())
     tr = iterator(train_)
     te = iterator(test_)
@@ -219,7 +205,7 @@ def train_graph(graph, sess, batch_size = 1024, num_epochs = 1000, iterator = Pa
             tr_losses.append(accuracy / step)
             step, accuracy = 0, 0
             #eval test set
-            """
+            
             te_epoch = te.epochs
             while te.epochs == te_epoch:
                 step += 1
@@ -227,17 +213,28 @@ def train_graph(graph, sess, batch_size = 1024, num_epochs = 1000, iterator = Pa
                 feed = {g['x']: batch[0], g['y']: batch[1], g['seqlen']: batch[2]}
                 accuracy_ = sess.run([g['accuracy'],g['loss']], feed_dict=feed)[0]
                 accuracy += accuracy_
-
             te_losses.append(accuracy / step)
-            """
             step, accuracy = 0,0
+            
             if current_epoch%5 == 0:
-                print("Accuracy after epoch", current_epoch, " - tr:", tr_losses[-1]," - learning rate:", l_r)#, "- te:", te_losses[-1])
-    return tr_losses#, te_losses
+                print(" - learning rate:", l_r," Accuracy after epoch", current_epoch, " - tr:", tr_losses[-1], "- te:", te_losses[-1])
+    end = time.time()
+    seconds = end - start
+    minutes = seconds//60
+    seconds = seconds % 60
+    hours = 0
+    if minutes > 60:
+        hours = minutes//60
+        minutes = minutes%60
+    print("time taken for training: {0} hours, {1} minutes and {2} seconds".format(hours,minutes,seconds))
+    return tr_losses, te_losses
 
 # main run of the graph. Use tr,te = train_graph(g)
 # if predicting on the test set
 g = build_graph(batch_size = 1024)
-#tr_losses, te_losses = train_graph(g)
 sess = tf.Session()
-tr_losses = train_graph(g, sess)
+tr_losses,te_losses = train_graph(g, sess)
+plt.figure(figsize = (10,6))
+plt.plot(tr_losses,label = 'training accuracy')
+plt.plot(te_losses,label = 'testing accuracy')
+plt.legend()
