@@ -347,7 +347,7 @@ model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose
 score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
 print('\nTest score:', score_lstm_sigmoid_FC) # 0.145
 print('\nTest accuracy:', acc_lstm_sigmoid_FC) # 0.962
-"""
+
 print("\n...Trying a huge model with stacked LSTMs and trainable w2v embedding...\n")
 model = Sequential()
 model.add(Embedding(len(embedding_matrix), 32,weights = [embedding_matrix],trainable = True))
@@ -372,3 +372,28 @@ model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose
 score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
 print('\nTest score:', score_lstm_sigmoid_FC) # 0.150
 print('\nTest accuracy:', acc_lstm_sigmoid_FC) # 0.963
+"""
+print("\n...Trying a huge model with stacked LSTMs and trainable w2v embedding...\n")
+model = Sequential()
+model.add(Embedding(len(embedding_matrix), 32,weights = [embedding_matrix],trainable = True))
+model.add(GRU(128,batch_size = batch_size,return_sequences = True)) # if return sequences is set to False (default)
+                                            # it will return a single a single vector of
+                                            # dimension = # of units in LSTM
+                                            # for stacked, we need a sequnce of vectors
+                                            # so set return_sequences = True for 
+                                            # stacked LSTM (RNN) layers
+#model.add(LSTM(128,return_sequences = True, input_shape = (timesteps,data_dim)))
+model.add(GRU(128,return_sequences = True))
+model.add(GRU(128,return_sequences = True))
+model.add(GRU(128,return_sequences = True))
+model.add(GRU(128))
+model.add(Dense(128, activation='tanh'))
+model.add(Dense(64, activation='tanh'))
+model.add(Dense(1, activation='sigmoid'))
+model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
+model.summary()
+print('\nTrain...\n')
+model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
+score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
+print('\nTest score:', score_lstm_sigmoid_FC) # 0.128
+print('\nTest accuracy:', acc_lstm_sigmoid_FC) # 0.9633
