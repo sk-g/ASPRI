@@ -12,9 +12,9 @@ from keras.models import Sequential
 from keras.layers import LSTM,Flatten,Dense,Embedding,GRU,BatchNormalization
 from keras.layers.embeddings import Embedding
 from keras.preprocessing import sequence
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pylab as pl
+#import matplotlib.pyplot as plt
+#import seaborn as sns
+#import pylab as pl
 from sklearn.model_selection import train_test_split as split
 start = time.time()
 
