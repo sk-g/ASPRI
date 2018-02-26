@@ -6,5 +6,5 @@ word2vec/.ipynb_checkpoints
 *.zip
 word2vec/old
 word2vec/tex9
-supervised/keras supervised_LSTM.ipynb
+supervised/keras\ supervised_LSTM.ipynb
 supervised/_spark.py
