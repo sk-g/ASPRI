@@ -1,10 +1,10 @@
 *.gz
 *.28.ipynb_checkpoints
-/data/ipv4 snapshots/data/ipv6 snapshots
-/word2vec/.ipynb_checkpoints
-*/.ipynb_checkpoints
+data/ipv4 snapshots/data/ipv6 snapshots
+word2vec/.ipynb_checkpoints
+*.ipynb_checkpoints
 *.zip
-/word2vec/old
-/word2vec/tex9
-/supervised/keras supervised_LSTM.ipynb
-/supervised/_spark.py
+word2vec/old
+word2vec/tex9
+supervised/keras supervised_LSTM.ipynb
+supervised/_spark.py
