@@ -2,4 +2,5 @@
 *.28.ipynb_checkpoints
 *.ipynb
 !keras_supervised_LSTM.ipynb
-!supervised_LSTM.ipynb
+!losses.ipynb
+/supervised/logs/
