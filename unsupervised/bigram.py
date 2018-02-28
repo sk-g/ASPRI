@@ -41,4 +41,8 @@ test_path = bigram_lines[0]
 
 print("sum of bigram counts:{0}\t{1}".format(sum(bigram_values),len(bigram_values)))
 
-#path = 
+# bigram_values -> bigram frequencies:
+# bigram_values[i]/=sum(bigram_values)
+sum_of_bigrams = sum(bigram_values)
+bigram_values = [i/sum_of_bigrams for i in bigram_values] # TF
+
