@@ -133,96 +133,23 @@ def encode_lines(arr):
     assert(len(new_array[0]) == 30)
     return new_array
 encoded_train = encode_lines(train)
-
-
-# In[18]:
-
-
-#len(encoded_train)
-
-
-# In[19]:
-
-
+encoded_train = encoded_train.reshape(encoded_train.shape[0],encoded_train.shape[1],encoded_train.shape[2])
+#print(encoded_train.shape)
 encoded_test = encode_lines(test)
+encoded_test = encoded_test.reshape(encoded_test.shape[0],encoded_test.shape[1],encoded_test.shape[2])
 
-
-# In[20]:
-
-
-train_lengths = [len(t) for t in encoded_train] #array of lengths so we can pad zeros later
-test_lengths= [len(t) for t in encoded_test] #array of lengths for test set to be padded later
-
-
-# In[21]:
-
-
-y_test,y_train = test['Fake'],train['Fake']
-
-
-# In[22]:
-
-
-x_train = encode_lines(train)#['Paths'])
-x_test = encode_lines(test)#['Paths'])
-
-
-# In[23]:
-
-
-max_length = 30
 vocab_size = 24612 #unique tokens for this file
-encoded_train = [one_hot(d,vocab_size) for d in train['Paths']]
-encoded_test = [one_hot(d,vocab_size) for d in test['Paths']]
-train_lengths = [len(t) for t in encoded_train] #array of lengths so we can pad zeros later
-test_lengths= [len(t) for t in encoded_test] #array of lengths for test set to be padded later
-
-
-# In[24]:
-
-
-labels_train = train['Fake']
-train_dic={}
-train_dic["data"] = encoded_train
-train_dic["labels"] = labels_train#labels_train[0].ravel().tolist()
-train_dic["length"] = train_lengths
-train_len = len(train)
-test_len = len(test)
-
-train_ = pd.DataFrame.from_dict(data=train_dic, orient='columns', dtype=None)
-
-
-
-test_dic={}
-test_dic["data"] = encoded_test
-test_dic["length"] = test_lengths
-test_dic["labels"] = test['Fake']
-test_ = pd.DataFrame.from_dict(data=test_dic, orient='columns', dtype=None)
 
 test_input = test.values
 
 
-# In[25]:
-
-
-x_train, x_test = train_["data"],test_["data"]
+x_train, x_test = encoded_train,encoded_test
 y_train,y_test = train['Fake'],test['Fake']
 
-
-# In[26]:
-
-
 max_features = vocab_size
-maxlen = 30  # cut texts after this number of words (among top max_features most common words)
 batch_size = 1024
 epochs = 10 #training steps
-#print(len(x_train), 'train sequences')
-#print(len(x_test), 'test sequences')
-#print('Pad sequences (samples x time)')
-x_train = sequence.pad_sequences(x_train, maxlen=maxlen)
-x_test = sequence.pad_sequences(x_test, maxlen=maxlen)
-#print('x_train shape:', x_train.shape)
-#print('x_test shape:', x_test.shape)
+
 
 
 print("\n..... Extracting and building the word2vec results .....")
@@ -375,8 +302,8 @@ print('\nTest accuracy:', acc_lstm_sigmoid_FC) # 0.963
 """
 print("\n...Trying a huge model with stacked LSTMs and trainable w2v embedding...\n")
 model = Sequential()
-model.add(Embedding(len(embedding_matrix), 32,weights = [embedding_matrix],trainable = True))
-model.add(GRU(128,batch_size = batch_size,return_sequences = True)) # if return sequences is set to False (default)
+#model.add(Embedding(len(embedding_matrix), 32,weights = [embedding_matrix],trainable = True))
+model.add(GRU(128,batch_size = batch_size,input_shape = (encoded_train.shape[1],encoded_train.shape[2]),return_sequences = True)) # if return sequences is set to False (default)
                                             # it will return a single a single vector of
                                             # dimension = # of units in LSTM
                                             # for stacked, we need a sequnce of vectors
