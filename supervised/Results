@@ -1,0 +1,166 @@
+Results
+
+LSTM(30) => LSTM with 30 hidden units.
+Embedding Layer (32) => inputs mapped to (# of unique AS +1, 32) vector space. +1 for Unkown word smoothing.
+BN => BatchNormalization applied to corresponding layer.
+Dense(1) => A fully connected layer with 1 output unit.
+d => dropout rate
+rd => recurrent dropout rate
+Trainable Embedding W2V  => A trainable Embedding layer with word2vec final embedding result. (RNN and word representation are learned simulataneously)
+________________________________________________________________________
+Model Description		|	Validation Accuracy		|	Validation Loss
+________________________________________________________________________
+Embedding Layer (32) +	|
+LSTM(30) + dropout = 0.2|
+Dense(1) sigmoid		|	0.9622					|	0.1530
+________________________________________________________________________
+Embedding Layer (32) +	|
+GRU(30) + dropout = 0.2 |
+Dense(1) sigmoid		|	0.9615					|	0.1532
+_________________________________________________________________________
+Embedding Layer (32) +	|
+LSTM(30) + dropout = 0.2|
+Dense(1) tanh			|	0.9529					|	0.2277
+________________________________________________________________________
+Embedding Layer (32) +	|
+LSTM(30) + dropout = 0.2|
+Dense(1) Results		|	0.8101					|	0.2220
+_________________________________________________________________________
+
+Embedding Layer (32) +	|
+LSTM(30) + dropout = 0.2|
+Dense(1) elu			|	0.8323					|	0.2599
+_________________________________________________________________________
+
+Embedding Layer (32) +	|
+LSTM(30) + dropout = 0.2|
+Dense(1) relu			|	0.7850					|	0.5202
+Dense(1) relu			|
+Dense(1) sigmoid		|
+_________________________________________________________________________
+
+Embedding Layer (32) +	|
+LSTM(30) + dropout = 0.8|
+Dense(1) relu			|	0.7850					|	0.5205
+Dense(1) relu			| # increasing dropout rate had little no effect
+Dense(1) sigmoid		|
+_________________________________________________________________________
+
+Embedding Layer (32) +	|
+LSTM(30) + dropout = 0.2|
+Dense(1) relu + BN		|	0.8461					|	0.4205
+Dense(1) relu + BN		|
+Dense(1) sigmoid		|
+_________________________________________________________________________
+Embedding Layer (32) +	|
+GRU(30) + dropout = 0.2 |
+Dense(1) relu + BN		|	0.9621					|	0.1534
+Dense(1) relu + BN		|
+Dense(1) sigmoid		|
+_________________________________________________________________________
+
+Embedding Layer (32) +	|
+LSTM(30) 				|
+	+ d = 0.2 + rd = 0.2|
+Dense(1) sigmoid		|	0.9616					|	0.1512
+________________________________________________________________________
+
+Embedding Layer (32) +	|
+LSTM(30) 				|
+	+ d = 0.2 + rd = 0.8| # obviously converged much faster 
+Dense(1) sigmoid		|	0.9607					|	0.1550 
+________________________________________________________________________
+
+Embedding Layer(32)+ w2v|
+LSTM(30) 				|
+	+ d = 0.2 + rd = 0.2| # not quite promising(yet)
+Dense(1) sigmoid		|	0.9355					|	0.2121
+________________________________________________________________________
+Embedding Layer(32)+ w2v|
+LSTM(30) 				|
+	+ d = 0.2 + rd = 0.2| # adding a dense layer did not help
+Dense(16) sigmoid
+Dense(1) sigmoid		|	0.9193					|	0.2498
+________________________________________________________________________
+Embedding Layer(32)+ w2v|
+LSTM(30) 				|
+	+ d = 0.2 + rd = 0.2| # adding more hidden units helped
+Dense(32) sigmoid
+Dense(1) sigmoid		|	0.9397					|	0.2042
+________________________________________________________________________
+Trainable Embedding W2V |
+LSTM(30) 				|
+	+ d = 0.2 + rd = 0.2|
+Dense(16) sigmoid
+Dense(1) sigmoid		|	0.9619					|	0.1495***
+________________________________________________________________________
+Embedding Layer(32)+ w2v|
+LSTM(128) 				|
+	+ d = 0.2 + rd = 0.2| # increased number of hidden units in LSTM
+Dense(16) sigmoid
+Dense(1) sigmoid		|	0.9442					|	0.1919
+________________________________________________________________________
+Embedding Layer(32)+ w2v|
+LSTM(128) 				|
+	+ d = 0.2 + rd = 0.2| # increased number of hidden units in dense layer
+Dense(32) sigmoid
+Dense(1) sigmoid		|	0.9448					|	0.1497
+________________________________________________________________________
+Trainable Embedding W2V |
+LSTM(128) 				|
+	+ d = 0.2 + rd = 0.2| # increased number of hidden units in dense layer
+Dense(64) sigmoid
+Dense(1) sigmoid		|	0.9626					|	0.1511
+____________________________________________________________________________
+Trainable Embedding W2V | # trainable embedding layer with w2v initialization
+LSTM(128) 				|
+	+ d = 0.2 + rd = 0.2| # added an extra dense layer
+Dense(64) sigmoid		|							|
+Dense(32) sigmoid		|							|
+Dense(1) sigmoid		|	0.96308					|	0.1448***
+________________________________________________________________________
+
+
+
+Confusion Matrix on test set:
+		true negatives = 34202
+		false positives = 12083
+		false negatives = 644
+		true positives = 172027
+		
+__________________________________
+Confusion Matrix on test set:
+		true negatives = 36487
+		false positives = 9798
+		false negatives = 1552
+		true positives = 171119
+		
+__________________________________
+Confusion Matrix on test set:
+		true negatives = 35520
+		false positives = 10765
+		false negatives = 334
+		true positives = 172337
+		
+__________________________________
+Confusion Matrix on test set:
+		true negatives = 36645
+		false positives = 9640
+		false negatives = 861
+		true positives = 171810
+		
+__________________________________
+Confusion Matrix on test set:
+		true negatives = 36355
+		false positives = 9930
+		false negatives = 452
+		true positives = 172219
+		
+__________________________________
+Confusion Matrix on test set:
+		true negatives = 36254
+		false positives = 10031
+		false negatives = 199
+		true positives = 172472
+		
+__________________________________

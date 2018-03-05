@@ -12,13 +12,10 @@ from keras.models import Sequential
 from keras.layers import LSTM,Flatten,Dense,Embedding,GRU,BatchNormalization
 from keras.layers.embeddings import Embedding
 from keras.preprocessing import sequence
-#import matplotlib.pyplot as plt
-#import seaborn as sns
-#import pylab as pl
 from sklearn.model_selection import train_test_split as split
+from sklearn.metrics import confusion_matrix
 start = time.time()
-#sys.stdout = open('word2vec_print.txt','w')
-## loading the file with paths ##
+from temp import drawProgressBar
 
 if os.name != 'posix':
 	f = open(r'M:\Course stuff\ASPRI\data\PCH\paths\11012018.txt','r')
@@ -30,8 +27,6 @@ lines = [i.strip() for i in lines]
 
 # loading the word dictionaries, frequency counts
 # and embedding vector form word2vec results
-
-
 if os.name != 'posix':
 	final_embeddings = pickle.load(open(r'M:\Course stuff\ASPRI\supervised\gcp_fe','rb'))#original 32 dims w2v
 	#final_embeddings = pickle.load(open(r'M:\Course stuff\ASPRI\supervised\128dimsw2v','rb'))# 128 dims w2v
@@ -48,12 +43,7 @@ max_length = 30
 vocab_size = 24612 #unique tokens for this file
 embedding_dim = final_embeddings.shape[1]
 # saving the state of final embeddings
-
-
 original_gcp_fe = final_embeddings.copy()
-
-
-
 
 # reading the labeled data from csv
 if os.name != 'posix':
@@ -64,17 +54,6 @@ del paths['Unnamed: 0']
 #paths.head()
 
 train,test = split(paths,test_size = 0.3) # splitting into train,test
-
-
-# uncomment to show plot of fake-ness
-# sns.countplot(x = 'Fake',data = train)
-# plt.show()
-#print("\nReal and fake in training set: {0}\nReal and fake in test set {1}".format(train.Fake.value_counts(),test.Fake.value_counts()))
-
-# In[16]:
-
-
-
 
 def encode_lines(arr,embedding_dim = 32):
 	# function works on df
@@ -151,34 +130,78 @@ for i in list(reverse_dictionary.keys()):
 		embedding_matrix[i-1] = embedding_vector
 timesteps = 30
 data_dim = 30
+def cnfmx(y_true,y_pred):
 
-"""
+	####
+	# 				True Conditions
+	# 				valid invalid
+	# predictions
+	# valid 		tp 		fp
+	# invalid 		fn 		tn
+	####
+	predictions = [i[0] for i in y_pred]
+	p = [0]*len(predictions)
+	print("\nGetting Predictions..\n")
+	for i in range(len(predictions)):
+		drawProgressBar(i/len(predictions))
+		if predictions[i] >=0.5:
+			p[i] = 1
+	print("\n")
+	tp,fp,fn,tn = 0,0,0,0
+	i = 0
+	for index,value in y_true.iteritems():
+		if value == 0: # true condition valid
+			if p[i] == 0:# predict valid
+				tp += 1# tp
+			else:# predict invalid
+				fn += 1 # fn
+		elif value == 1:# true condition invalid
+			if p[i] == 1:# predict invalid
+				tn += 1# true negative
+			else:# predict valid
+				fp += 1# false positive
+		i += 1
+	acc = (tp+tn)*100/(len(predictions))
+	#tn,fp,fn,tp = confusion_matrix(y_test,p).ravel()
+	sys.stdout = open('confusion matrix.txt','a')
+
+	print("Confusion Matrix on test set:\n\
+		true negatives = {}\n\
+		false positives = {}\n\
+		false negatives = {}\n\
+		true positives = {}\n\
+		accuracy = {}\n".format(tn,fp,fn,tp,acc))
+	print("__________________________________")
+	sys.stdout = sys.__stdout__
+	return
+
+
 print('Build first model...')
 model = Sequential()
-#model.add(Embedding(len(embedding_matrix), embedding_dim,weights = [embedding_matrix],trainable = False))
 model.add(LSTM(32, dropout=0.2, recurrent_dropout=0.2,input_shape = (encoded_train.shape[1],encoded_train.shape[2])))
 model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.summary()
+#model.summary()
 print('\nTrain...\n')
 model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
 score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
+predictions = model.predict(x_train)
+cnfmx(y_train,predictions)
 print('\nTest score:', score_lstm_sigmoid_FC)
 print('\nTest accuracy:', acc_lstm_sigmoid_FC)
-# 84.84% training accuracy for 128 dims w2v
-# testing accuracy 84.805%
+
 
 print('\nBuilding above model but without dropout...\n')
-
 model = Sequential()
 model.add(LSTM(32, input_shape = (encoded_train.shape[1],encoded_train.shape[2])))
-#model.add(Dense(16, activation='sigmoid'))
 model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.summary()
+#model.summary()
 print('\nTrain...\n')
 model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
 score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
+predictions = model.predict(x_train)
+cnfmx(y_train,predictions)
 print('\nTest score:', score_lstm_sigmoid_FC)
 print('\nTest accuracy:', acc_lstm_sigmoid_FC)
 
@@ -188,24 +211,28 @@ model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2, input_shape = (encoded_t
 #model.add(Dense(16, activation='sigmoid'))
 model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.summary()
+#model.summary()
 print('\nTrain...\n')
 model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
 score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
+predictions = model.predict(x_train)
+cnfmx(y_train,predictions)
 print('\nTest score:', score_lstm_sigmoid_FC)
 print('\nTest accuracy:', acc_lstm_sigmoid_FC)
 
-print('\nBuilding above model with an additional dense layer ...\n')
+print('\nBuilding above model with an additional dense layer and BatchNormalization ...\n')
 model = Sequential()
 model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2, input_shape = (encoded_train.shape[1],encoded_train.shape[2])))
 model.add(Dense(16, activation='sigmoid'))
 model.add(BatchNormalization())
 model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.summary()
+#model.summary()
 print('\nTrain...\n')
 model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
 score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
+predictions = model.predict(x_train)
+cnfmx(y_train,predictions)
 print('\nTest score:', score_lstm_sigmoid_FC)
 print('\nTest accuracy:', acc_lstm_sigmoid_FC)
 
@@ -221,10 +248,12 @@ model.add(Dense(16, activation='sigmoid'))
 model.add(BatchNormalization())
 model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.summary()
+#model.summary()
 print('\nTrain...\n')
 model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
 score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
+predictions = model.predict(x_train)
+cnfmx(y_train,predictions)
 print('\nTest score:', score_lstm_sigmoid_FC)
 print('\nTest accuracy:', acc_lstm_sigmoid_FC)
 
@@ -238,19 +267,49 @@ model.add(Dense(16, activation='sigmoid'))
 model.add(BatchNormalization())
 model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.summary()
+#model.summary()
 print('\nTrain...\n')
 model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
 score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
+predictions = model.predict(x_train)
+cnfmx(y_train,predictions)
 print('\nTest score:', score_lstm_sigmoid_FC)
 print('\nTest accuracy:', acc_lstm_sigmoid_FC)
-"""
+
+print("Trying a huge stacked LSTM model with many hidden units and FC Layers")
+model = Sequential()
+model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2, input_shape = (encoded_train.shape[1],encoded_train.shape[2]), return_sequences = True))
+model.add(LSTM(128,return_sequences = True))
+model.add(LSTM(128,return_sequences = True))
+model.add(LSTM(128))
+model.add(Dense(128, activation = 'sigmoid'))
+model.add(BatchNormalization())
+model.add(Dense(128,activation = 'sigmoid'))
+model.add(BatchNormalization())
+model.add(Dense(64,activation = 'sigmoid'))
+model.add(BatchNormalization())
+model.add(Dense(32,activation = 'sigmoid'))
+model.add(BatchNormalization())
+model.add(Dense(1,activation = 'sigmoid'))
+model.compile(loss = 'binary_crossentropy',optimizer = 'adam',metrics=['accuracy'])
+#model.summary()
+print('\nTrain...\n')
+model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
+score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
+predictions = model.predict(x_train)
+cnfmx(y_train,predictions)
+print('\nTest score:', score_lstm_sigmoid_FC)
+print('\nTest accuracy:', acc_lstm_sigmoid_FC)
+###################### above are models run on (26k,32) vector space ###############################
+
 
 print("\n\nRunning All the models but now with the 128 dimension word2vec ...\n\n")
 
 if os.name != 'posix':
 	#final_embeddings = pickle.load(open(r'M:\Course stuff\ASPRI\supervised\gcp_fe','rb'))#original 32 dims w2v
 	final_embeddings = pickle.load(open(r'M:\Course stuff\ASPRI\supervised\128dimsw2v','rb'))# 128 dims w2v
+else:
+	final_embeddings = pickle.load(open('128dimsw2v','wb'))
 embedding_dim = final_embeddings.shape[1]
 encoded_train = encode_lines(train,embedding_dim = embedding_dim)
 encoded_train = encoded_train.reshape(encoded_train.shape[0],encoded_train.shape[1],encoded_train.shape[2])
@@ -268,16 +327,6 @@ epochs = 10 #training steps
 
 
 print("\n..... Extracting and building the word2vec results .....")
-embedding_matrix = {}
-for i in list(reverse_dictionary.keys()):
-	embedding_matrix[i] = final_embeddings[i-1]
-
-
-# In[29]:
-
-
-print("Word2Vec embedding space has the shape: {0}\n".format(final_embeddings.shape))
-
 verbose = 1
 batch_size = 128
 epochs = 5
@@ -288,35 +337,34 @@ for i in list(reverse_dictionary.keys()):
 	if embedding_vector is not None:
 		# words not found in embedding index will be all-zeros.
 		embedding_matrix[i-1] = embedding_vector
-timesteps = 30
-data_dim = 30
-###################################################
+
+print("Done. Embedding Space : {}".format(embedding_matrix.shape))		
 print('Build first model...')
 model = Sequential()
-#model.add(Embedding(len(embedding_matrix), embedding_dim,weights = [embedding_matrix],trainable = False))
 model.add(LSTM(32, dropout=0.2, recurrent_dropout=0.2,input_shape = (encoded_train.shape[1],encoded_train.shape[2])))
 model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.summary()
+#model.summary()
 print('\nTrain...\n')
 model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
 score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
+predictions = model.predict(x_train)
+cnfmx(y_train,predictions)
 print('\nTest score:', score_lstm_sigmoid_FC)
 print('\nTest accuracy:', acc_lstm_sigmoid_FC)
-# 84.84% training accuracy for 128 dims w2v
-# testing accuracy 84.805%
+
 
 print('\nBuilding above model but without dropout...\n')
-
 model = Sequential()
 model.add(LSTM(32, input_shape = (encoded_train.shape[1],encoded_train.shape[2])))
-#model.add(Dense(16, activation='sigmoid'))
 model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.summary()
+#model.summary()
 print('\nTrain...\n')
 model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
 score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
+predictions = model.predict(x_train)
+cnfmx(y_train,predictions)
 print('\nTest score:', score_lstm_sigmoid_FC)
 print('\nTest accuracy:', acc_lstm_sigmoid_FC)
 
@@ -326,24 +374,28 @@ model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2, input_shape = (encoded_t
 #model.add(Dense(16, activation='sigmoid'))
 model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.summary()
+#model.summary()
 print('\nTrain...\n')
 model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
 score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
+predictions = model.predict(x_train)
+cnfmx(y_train,predictions)
 print('\nTest score:', score_lstm_sigmoid_FC)
 print('\nTest accuracy:', acc_lstm_sigmoid_FC)
 
-print('\nBuilding above model with an additional dense layer ...\n')
+print('\nBuilding above model with an additional dense layer and BatchNormalization ...\n')
 model = Sequential()
 model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2, input_shape = (encoded_train.shape[1],encoded_train.shape[2])))
 model.add(Dense(16, activation='sigmoid'))
 model.add(BatchNormalization())
 model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.summary()
+#model.summary()
 print('\nTrain...\n')
 model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
 score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
+predictions = model.predict(x_train)
+cnfmx(y_train,predictions)
 print('\nTest score:', score_lstm_sigmoid_FC)
 print('\nTest accuracy:', acc_lstm_sigmoid_FC)
 
@@ -359,10 +411,12 @@ model.add(Dense(16, activation='sigmoid'))
 model.add(BatchNormalization())
 model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.summary()
+#model.summary()
 print('\nTrain...\n')
 model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
 score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
+predictions = model.predict(x_train)
+cnfmx(y_train,predictions)
 print('\nTest score:', score_lstm_sigmoid_FC)
 print('\nTest accuracy:', acc_lstm_sigmoid_FC)
 
@@ -376,146 +430,39 @@ model.add(Dense(16, activation='sigmoid'))
 model.add(BatchNormalization())
 model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.summary()
+#model.summary()
 print('\nTrain...\n')
 model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
 score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
-print('\nTest score:', score_lstm_sigmoid_FC)
-print('\nTest accuracy:', acc_lstm_sigmoid_FC)
-"""
-
-#from keras.layers import TimeDistributed
-print('Building w2v embedding model with denser (16 units) FC layer ...')
-model = Sequential()
-model.add(Embedding(len(embedding_matrix), 32,weights = [embedding_matrix],trainable = False))
-model.add(LSTM(30, dropout=0.2, recurrent_dropout=0.2))
-model.add(Dense(16, activation='sigmoid'))
-model.add(Dense(1, activation='sigmoid'))
-model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.summary()
-print('\nTrain...\n')
-model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
-score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
-print('\nTest score:', score_lstm_sigmoid_FC)
-print('\nTest accuracy:', acc_lstm_sigmoid_FC)
-## 0.924 , 0.232
-
-
-print('Building w2v embedding model with denser LSTM-128, relu 32, sigmoid FC layer with BatchNormalization...')
-model = Sequential()
-model.add(Embedding(len(embedding_matrix), 32,weights = [embedding_matrix],trainable = False))
-model.add(LSTM(128))#, dropout=0.2, recurrent_dropout=0.2))
-model.add(Dense(16, activation='relu'))
-model.add(BatchNormalization())
-model.add(Dense(1, activation='sigmoid'))
-model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.summary()
-print('\nTrain...\n')
-model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
-score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
+predictions = model.predict(x_train)
+cnfmx(y_train,predictions)
 print('\nTest score:', score_lstm_sigmoid_FC)
 print('\nTest accuracy:', acc_lstm_sigmoid_FC)
 
-# 0.952 , 0.174
-
-
-## stacked LSTMs without stateful representation, without trainable embeddings
-# note : in LSTM calls, default dropout is set 0.0!
-
-
+print("Trying a huge stacked LSTM model with many hidden units and FC Layers")
 model = Sequential()
-model.add(Embedding(len(embedding_matrix), 32,weights = [embedding_matrix],trainable = False))
-model.add(LSTM(64,return_sequences = True)) # if return sequences is set to False (default)
-											# it will return a single a single vector of
-											# dimension = # of units in LSTM
-											# for stacked, we need a sequnce of vectors
-											# so set return_sequences = True for 
-											# stacked LSTM (RNN) layers
-#model.add(LSTM(128,return_sequences = True, input_shape = (timesteps,data_dim)))
-model.add(LSTM(64,return_sequences = True))
-model.add(LSTM(64))
-model.add(Dense(1, activation='sigmoid'))
-model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.summary()
-print('\nTrain...\n')
-model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
-score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
-print('\nTest score:', score_lstm_sigmoid_FC) # 0.1709
-print('\nTest accuracy:', acc_lstm_sigmoid_FC) # 0.9511
-
-
-## trainable
-print("\n...Trying a trainable w2v space version of the previous model...\n")
-model = Sequential()
-model.add(Embedding(len(embedding_matrix), 32,weights = [embedding_matrix],trainable = True))
-model.add(LSTM(64,batch_size = batch_size,return_sequences = True)) # if return sequences is set to False (default)
-											# it will return a single a single vector of
-											# dimension = # of units in LSTM
-											# for stacked, we need a sequnce of vectors
-											# so set return_sequences = True for 
-											# stacked LSTM (RNN) layers
-#model.add(LSTM(128,return_sequences = True, input_shape = (timesteps,data_dim)))
-model.add(LSTM(64,return_sequences = True))
-model.add(LSTM(64))
-model.add(Dense(1, activation='sigmoid'))
-model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.summary()
-print('\nTrain...\n')
-model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
-score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
-print('\nTest score:', score_lstm_sigmoid_FC) # 0.145
-print('\nTest accuracy:', acc_lstm_sigmoid_FC) # 0.962
-
-print("\n...Trying a huge model with stacked LSTMs and trainable w2v embedding...\n")
-model = Sequential()
-model.add(Embedding(len(embedding_matrix), 32,weights = [embedding_matrix],trainable = True))
-model.add(LSTM(128,batch_size = batch_size,return_sequences = True)) # if return sequences is set to False (default)
-											# it will return a single a single vector of
-											# dimension = # of units in LSTM
-											# for stacked, we need a sequnce of vectors
-											# so set return_sequences = True for 
-											# stacked LSTM (RNN) layers
-#model.add(LSTM(128,return_sequences = True, input_shape = (timesteps,data_dim)))
-model.add(LSTM(128,return_sequences = True))
+model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2, input_shape = (encoded_train.shape[1],encoded_train.shape[2]), return_sequences = True))
 model.add(LSTM(128,return_sequences = True))
 model.add(LSTM(128,return_sequences = True))
 model.add(LSTM(128))
-model.add(Dense(128, activation='tanh'))
-model.add(Dense(64, activation='tanh'))
-model.add(Dense(1, activation='sigmoid'))
-model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.summary()
+model.add(Dense(128, activation = 'sigmoid'))
+model.add(BatchNormalization())
+model.add(Dense(128,activation = 'sigmoid'))
+model.add(BatchNormalization())
+model.add(Dense(64,activation = 'sigmoid'))
+model.add(BatchNormalization())
+model.add(Dense(32,activation = 'sigmoid'))
+model.add(BatchNormalization())
+model.add(Dense(1,activation = 'sigmoid'))
+model.compile(loss = 'binary_crossentropy',optimizer = 'adam',metrics=['accuracy'])
+#model.summary()
 print('\nTrain...\n')
 model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
 score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
-print('\nTest score:', score_lstm_sigmoid_FC) # 0.150
-print('\nTest accuracy:', acc_lstm_sigmoid_FC) # 0.963
-
-print("\n...Trying a huge model with stacked LSTMs and trainable w2v embedding...\n")
-model = Sequential()
-#model.add(Embedding(len(embedding_matrix), 32,weights = [embedding_matrix],trainable = True))
-model.add(GRU(128,batch_size = batch_size,input_shape = (encoded_train.shape[1],encoded_train.shape[2]),return_sequences = True)) # if return sequences is set to False (default)
-											# it will return a single a single vector of
-											# dimension = # of units in LSTM
-											# for stacked, we need a sequnce of vectors
-											# so set return_sequences = True for 
-											# stacked LSTM (RNN) layers
-#model.add(LSTM(128,return_sequences = True, input_shape = (timesteps,data_dim)))
-model.add(GRU(128,return_sequences = True))
-model.add(GRU(128,return_sequences = True))
-model.add(GRU(128,return_sequences = True))
-model.add(GRU(128))
-model.add(Dense(128, activation='tanh'))
-model.add(Dense(64, activation='tanh'))
-model.add(Dense(1, activation='sigmoid'))
-model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
-model.summary()
-print('\nTrain...\n')
-model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
-score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
-print('\nTest score:', score_lstm_sigmoid_FC) # 0.128
-print('\nTest accuracy:', acc_lstm_sigmoid_FC) # 0.9633
-"""
+predictions = model.predict(x_train)
+cnfmx(y_train,predictions)
+print('\nTest score:', score_lstm_sigmoid_FC)
+print('\nTest accuracy:', acc_lstm_sigmoid_FC)
 
 end = time.time()
 seconds = end - start

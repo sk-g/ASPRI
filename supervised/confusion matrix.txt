@@ -1,0 +1,32 @@
+Confusion Matrix on test set:
+		true negatives = 35215
+		false positives = 11428
+		false negatives = 867
+		true positives = 171446
+		accuracy = 94.38471656405854
+
+__________________________________
+Confusion Matrix on test set:
+		true negatives = 36397
+		false positives = 10246
+		false negatives = 896
+		true positives = 171417
+		accuracy = 94.91130638119074
+
+__________________________________
+Confusion Matrix on test set:
+		true negatives = 36069
+		false positives = 10574
+		false negatives = 482
+		true positives = 171831
+		accuracy = 94.95058367891266
+
+__________________________________
+Confusion Matrix on test set:
+		true negatives = 36442
+		false positives = 10201
+		false negatives = 529
+		true positives = 171784
+		accuracy = 95.09947204004457
+
+__________________________________
