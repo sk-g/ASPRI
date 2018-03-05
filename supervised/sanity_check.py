@@ -115,7 +115,7 @@ for i in list(reverse_dictionary.keys()):
 
 
 print("Word2Vec embedding space has the shape: {0}\n".format(final_embeddings.shape))
-print("\nTraining data shape:{} \nTesting data shape: {}".format(encoded_train.shape,encoded_test.shape))
+print("\nTraining data shape:{} \nTesting data shape: {}".format(x_train[:-58].shape,x_test[:-33].shape))#encoded_train.shape,encoded_test.shape))
 verbose = 1
 batch_size = 128
 epochs = 5
@@ -132,13 +132,13 @@ data_dim = 30
 model = Sequential()
 #model.add(Embedding(len(embedding_matrix), 32,weights = [embedding_matrix],trainable = False))
 model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2,batch_size = batch_size,\
-	input_shape = (encoded_train.shape[1],encoded_train.shape[2]),return_sequences = False))
+	input_shape = (encoded_train.shape[1],encoded_train.shape[2])))
 #model.add(TimeDistributed(Dense(1,activation = 'sigmoid')))
 model.add(Dense(1, activation='sigmoid',batch_size = batch_size))
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
 model.summary()
 print('\nTrain...\n')
-model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test, y_test))
+model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,validation_data=(x_test[:-33], y_test[:-33]))
 score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
 print('\nTest score:', score_lstm_sigmoid_FC)
 print('\nTest accuracy:', acc_lstm_sigmoid_FC)

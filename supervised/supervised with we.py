@@ -192,7 +192,6 @@ test_len = len(test)
 train_ = pd.DataFrame.from_dict(data=train_dic, orient='columns', dtype=None)
 
 
-
 test_dic={}
 test_dic["data"] = encoded_test
 test_dic["length"] = test_lengths
@@ -207,9 +206,6 @@ test_input = test.values
 
 x_train, x_test = train_["data"],test_["data"]
 y_train,y_test = train['Fake'],test['Fake']
-
-
-# In[26]:
 
 
 max_features = vocab_size
@@ -266,7 +262,7 @@ print('\nTest accuracy:', acc_lstm_sigmoid_FC)
 
 # In[34]:
 
-
+"""
 #from keras.layers import TimeDistributed
 print('Building w2v embedding model with denser (16 units) FC layer ...')
 model = Sequential()
@@ -403,7 +399,7 @@ print('\nTest accuracy:', acc_lstm_sigmoid_FC) # 0.9633
 
 
 
-"""
+
 names = ['LSTM with sigmoid FC',
          'GRU with sigmoid FC',
          'LSTM with tanh FC',

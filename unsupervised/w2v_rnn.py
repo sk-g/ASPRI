@@ -2,18 +2,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import collections
-import math
-import os
-import random
+import collections,math,os,random,pickle,zipfile
 from tempfile import gettempdir
-import zipfile
-
 import numpy as np
 from six.moves import urllib
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '4'
 
 def drawProgressBar(percent, barLen = 50):
 	sys.stdout.write("\r")
@@ -112,9 +107,9 @@ def generate_batch(batch_size, num_skips, skip_window):
 # Step 4: Build and train a skip-gram model.
 
 batch_size = 1024
-embedding_size = 32  # Dimension of the embedding vector. 32. lets try higher dims
+embedding_size = 128  # Dimension of the embedding vector. 32. lets try higher dims
 skip_window = 8       # How many words to consider left and right.
-num_skips = 2         # How many times to reuse an input to generate a label.
+num_skips = 4         # How many times to reuse an input to generate a label.
 num_sampled = 64      # Number of negative examples to sample.    
 
 
@@ -123,8 +118,8 @@ num_sampled = 64      # Number of negative examples to sample.
 # validation samples to the words that have a low numeric ID, which by
 # construction are also the most frequent. These 3 variables are used only for
 # displaying model accuracy, they don't affect calculation.
-valid_size = 16     # Random set of words to evaluate similarity on.
-valid_window = 100  # Only pick dev samples in the head of the distribution.
+valid_size = 32     # Random set of words to evaluate similarity on.
+valid_window = 1024  # Only pick dev samples in the head of the distribution.
 valid_examples = np.random.choice(valid_window, valid_size, replace=False)
 
 
@@ -202,9 +197,9 @@ with tf.Session(graph=graph) as session:
 		# in the list of returned values for session.run()
 		_, loss_val = session.run([optimizer, loss], feed_dict=feed_dict)
 		average_loss += loss_val
-		if step % 5000 == 0:
+		if step % 1000 == 0:
 			if step > 0:
-				average_loss /= 5000
+				average_loss /= 1000
 			__ = float(learning_rate.eval())
 			average_loss_ = float(average_loss)
 			print("\nAverage loss at step {} : {:.3f}, learning rate = {:.3f}".format(step,average_loss_,__))
@@ -220,6 +215,9 @@ if minutes > 60:
 	hours = minutes//60
 	minutes = minutes%60
 print("time taken for running the notebook:\n {0} hours, {1} minutes and {2} seconds".format(hours,minutes,seconds))
+
+pickle.dump(final_embeddings,open('128dimsw2v','wb'))
+
 """
 def plot_with_labels(low_dim_embs, labels, filename):
 	assert low_dim_embs.shape[0] >= len(labels), 'More labels than embeddings'

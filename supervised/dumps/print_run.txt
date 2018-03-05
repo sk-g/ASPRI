@@ -1,0 +1,191 @@
+Running All the models but now with the 128 dimension word2vec ...
+
+
+encoding function, 128 is the _embedding_dim
+encoding function, 128 is the _embedding_dim
+
+        ..... Extracting and building the word2vec results .....
+Word2Vec embedding space has the shape: (24616, 128)
+
+Build first model...
+Layer (type)                 Output Shape              Param # 
+_________________________________________________________________
+Lstm_1 (LSTM)                (None, 32)                20608
+dense_1 (Dense)              (None, 1)                 33                                  
+=                          Total params: 20,641
+Trainable params: 20,641
+Non-trainable params:0
+
+
+Train...
+
+Train on 218956 samples, validate on 93839 samples     Epoch 1/5
+218956/218956 [==============================] - 151s 689us/step - loss:0.4332 - acc:0.8400 - val_loss:0.4157 - val_acc:0.8485                                
+Epoch 2/5
+218956/218956 [==============================] - 148s 677us/step - loss:0.4157 - acc:0.8486 - val_loss:0.4150 - val_acc:0.8487                                
+Epoch 3/5
+218956/218956 [==============================] - 147s 674us/step - loss:0.4150 - acc:0.8490 - val_loss:0.4146 - val_acc:0.8488                                
+Epoch 4/5
+218956/218956 [==============================] - 146s 665us/step - loss:0.4152 - acc:0.8491 - val_loss:0.4150 - val_acc:0.8488                                
+Epoch 5/5
+218956/218956 [==============================] - 152s 693us/step - loss:0.4149 - acc:0.8492 - val_loss:0.4148 - val_acc:0.8488
+93839/93839 [==============================] - 22s 230us/step
+
+Test score:0.4147984445838858
+
+Test accuracy:0.8488155244640162
+
+Building above model but without dropout...
+
+Layer (type)                 Output Shape              Param # 
+_________________________________________________________________
+Lstm_2 (LSTM)                (None, 32)                20608
+dense_2 (Dense)              (None, 1)                 33                                  
+=                          Total params: 20,641
+Trainable params: 20,641
+Non-trainable params:0
+
+
+Train...
+
+Train on 218956 samples, validate on 93839 samples     Epoch 1/5
+218956/218956 [==============================] - 137s 626us/step - loss:0.3151 - acc:0.8909 - val_loss:0.2102 - val_acc:0.9399                                 
+Epoch 2/5
+218956/218956 [==============================] - 129s 590us/step - loss:0.1892 - acc:0.9455 - val_loss:0.1758 - val_acc:0.9502                                
+Epoch 3/5
+218956/218956 [==============================] - 140s 638us/step - loss:0.1704 - acc:0.9526 - val_loss:0.1664 - val_acc:0.9538                                
+Epoch 4/5
+218956/218956 [==============================] - 131s 597us/step - loss:0.1619 - acc:0.9555 - val_loss:0.1603 - val_acc:0.9559                                
+Epoch 5/5
+218956/218956 [==============================] - 131s 598us/step - loss:0.1564 - acc:0.9573 - val_loss:0.1647 - val_acc:0.9546                                 
+93839/93839 [==============================] - 18s 195us/step
+
+Test score:0.16469034645183384
+
+Test accuracy:0.9546457229942732
+
+Building above model with more hidden units in LSTM ...
+
+Layer (type)                 Output Shape              Param # 
+_________________________________________________________________
+Lstm_3 (LSTM)                (None, 128)               131584
+dense_3 (Dense)              (None, 1)                 129                                 
+=                          Total params: 131,713
+Trainable params: 131,713
+Non-trainable params:0
+
+
+Train...
+
+Train on 218956 samples, validate on 93839 samples     Epoch 1/5
+218956/218956 [==============================] - 189s 862us/step - loss:0.4316 - acc:0.8410 - val_loss:0.4150 - val_acc:0.8485                                
+Epoch 2/5
+218956/218956 [==============================] - 203s 928us/step - loss:0.4148 - acc:0.8491 - val_loss:0.4141 - val_acc:0.8489                                
+Epoch 3/5
+218956/218956 [==============================] - 203s 925us/step - loss:0.4137 - acc:0.8494 - val_loss:0.4137 - val_acc:0.8492                                
+Epoch 4/5
+218956/218956 [==============================] - 210s 959us/step - loss:0.4136 - acc:0.8495 - val_loss:0.4142 - val_acc:0.8491                                
+Epoch 5/5
+218956/218956 [==============================] - 197s 899us/step - loss:0.4137 - acc:0.8494 - val_loss:0.4142 - val_acc:0.8490                                 
+93839/93839 [==============================] - 30s 317us/step
+
+Test score:0.4141617406677192
+
+Test accuracy:0.8489966858148404
+
+Building above model with an additional dense layer ...
+
+Layer (type)                 Output Shape              Param # 
+_________________________________________________________________
+Lstm_4 (LSTM)                (None, 128)               131584
+dense_4 (Dense)              (None, 16)                2064
+batch_normalization_1 (Batch (None, 16)                64
+dense_5 (Dense)              (None, 1)                 17                                  
+                             Total params: 133,729
+Trainable params: 133,697
+Non-trainable params: 32
+
+
+Train...
+
+Train on 218956 samples, validate on 93839 samples     Epoch 1/5
+218956/218956 [==============================] - 195s 890us/step - loss:0.2972 - acc:0.8987 - val_loss:0.1759 - val_acc:0.9503                                
+Epoch 2/5
+218956/218956 [==============================] - 202s 922us/step - loss:0.1796 - acc:0.9496 - val_loss:0.1656 - val_acc:0.9545                                
+Epoch 3/5
+218956/218956 [==============================] - 195s 892us/step - loss:0.1665 - acc:0.9549 - val_loss:0.1544 - val_acc:0.9585                                
+Epoch 4/5
+218956/218956 [==============================] - 201s 920us/step - loss:0.1600 - acc:0.9571 - val_loss:0.1568 - val_acc:0.9573                                
+Epoch 5/5
+218956/218956 [==============================] - 194s 887us/step - loss:0.1571 - acc:0.9580 - val_loss:0.1515 - val_acc:0.9588                                 
+93839/93839 [==============================] - 30s 319us/step
+
+Test score:0.151537266896435
+
+Test accuracy:0.9587698078624026
+Trying a stacked LSTM model
+Layer (type)                 Output Shape              Param # 
+_________________________________________________________________
+Lstm_5 (LSTM)                (None, 30, 128)           131584                              
+Lstm_6 (LSTM)                (None, 30, 64)            49408                               
+Lstm_7 (LSTM)                (None, 32)                12416
+batch_normalization_2 (Batch (None, 32)                128
+dense_6 (Dense)              (None, 16)                528
+batch_normalization_3 (Batch (None, 16)                64
+dense_7 (Dense)              (None, 1)                 17                                  
+	                          Total params: 194,145
+Trainable params: 194,049
+Non-trainable params: 96
+
+
+Train...
+
+Train on 218956 samples, validate on 93839 samples     Epoch 1/5
+218956/218956 [==============================] - 497s 2ms/step - loss:0.2910 - acc:0.8981 - val_loss:0.1835 - val_acc:0.9487                                  
+Epoch 2/5
+218956/218956 [==============================] - 510s 2ms/step - loss:0.1753 - acc:0.9513 - val_loss:0.1609 - val_acc:0.9566                                  
+Epoch 3/5
+218956/218956 [==============================] - 549s 3ms/step - loss:0.1633 - acc:0.9556 - val_loss:0.1624 - val_acc:0.9566                                  
+Epoch 4/5
+218956/218956 [==============================] - 471s 2ms/step - loss:0.1585 - acc:0.9571 - val_loss:0.1537 - val_acc:0.9585                                  
+Epoch 5/5
+218956/218956 [==============================] - 488s 2ms/step - loss:0.1553 - acc:0.9579 - val_loss:0.1490 - val_acc:0.9596                                  
+93839/93839 [==============================] - 62s 658us/step
+
+Test score:0.1490070686266086
+
+Test accuracy:0.9596223318662817
+Trying a stacked GRU version of above model
+Layer (type)                 Output Shape              Param # 
+_________________________________________________________________
+gru_1 (GRU)                  (None, 30, 128)           98688
+gru_2 (GRU)                  (None, 30, 64)            37056
+gru_3 (GRU)                  (None, 32)                9312
+batch_normalization_4 (Batch (None, 32)                128
+dense_8 (Dense)              (None, 16)                528
+batch_normalization_5 (Batch (None, 16)                64
+dense_9 (Dense)              (None, 1)                 17                                  
+=                          Total params: 145,793
+Trainable params: 145,697
+Non-trainable params: 96
+
+
+Train...
+
+Train on 218956 samples, validate on 93839 samples     Epoch 1/5
+218956/218956 [==============================] - 391s 2ms/step - loss:0.2903 - acc:0.8982 - val_loss:0.1701 - val_acc:0.9532                                  
+Epoch 2/5
+218956/218956 [==============================] - 385s 2ms/step - loss:0.1660 - acc:0.9548 - val_loss:0.1576 - val_acc:0.9582                                  
+Epoch 3/5
+218956/218956 [==============================] - 399s 2ms/step - loss:0.1597 - acc:0.9567 - val_loss:0.1543 - val_acc:0.9583                                  
+Epoch 4/5
+218956/218956 [==============================] - 385s 2ms/step - loss:0.1548 - acc:0.9582 - val_loss:0.1483 - val_acc:0.9598                                  
+Epoch 5/5
+218956/218956 [==============================] - 396s 2ms/step - loss:0.1526 - acc:0.9586 - val_loss:0.1456 - val_acc:0.9601
+93839/93839 [==============================] - 49s 527us/step
+
+Test score:0.1456362089575773
+
+Test accuracy:0.9601445028186575
+time taken for running the notebook:
+2.0 hours, 34.0 minutes and 33.74208331108093 seconds      
