@@ -108,20 +108,50 @@ class Experiment:
 		self.y_test = test['Fake']
 
 	def LogReg(self):
+		start = time.time()
 		self.data()
 		print("\nRunning LogisticRegression ...\n")
-		clf = LogisticRegression(penalty = 'l2',n_jobs = -1)
+		clf = LogisticRegression(verbose = 0,penalty = 'l2',n_jobs = 2, max_iter = 50)
 		clf.fit(self.x_train,self.y_train)
 		self.y_pred = clf.predict(self.x_train)
 		acc_train = metrics.accuracy(self.y_pred,self.y_train)*100
 
 		y_pred_test = clf.predict(self.x_test)
 		acc_test = metrics.accuracy(self.y_pred_test,self.y_test)*100
+		end = time.time()
+		seconds = end - start
+		minutes = seconds//60
+		seconds = seconds % 60
+		hours = 0
+		if minutes > 60:
+			hours = minutes//60
+			minutes = minutes%60
+		print("\nLogistic Regression results:\nTraining Accuracy = {0}\nTesting Accuracy = {1} \
+			and time taken = \n {2} hours, {3} minutes and {4} seconds".format(acc_train,acc_test,hours,minutes,seconds))
+	def SVM(self):
+		start = time.time()
+		self.data()
+		print("\nRunning SVM\n")
+		clf = svm.SVC(kernel = 'rbf')
+		clf.fit(self.x_train,self.y_train)
+		self.y_pred = clf.predict(self.x_train)
+		acc_train = metrics.accuracy(self.y_pred,self.y_train)*100
 
-		print("\nLogistic Regression results:\nTraining Accuracy = {}\nTesting Accuracy = {}".format(acc_train,acc_test))
-
+		y_pred_test = clf.predict(self.x_test)
+		acc_test = metrics.accuracy(self.y_pred_test,self.y_test)*100
+		end = time.time()
+		seconds = end - start
+		minutes = seconds//60
+		seconds = seconds % 60
+		hours = 0
+		if minutes > 60:
+			hours = minutes//60
+			minutes = minutes%60
+		print("\nSVM with RBF kernel results:\nTraining Accuracy = {0}\nTesting Accuracy = {1} \
+			and time taken = \n {2} hours, {3} minutes and {4} seconds".format(acc_train,acc_test,hours,minutes,seconds))
 LR = Experiment()
 text, csv = LR.loader()
 LR.pickle_load()
 #LR.data()
 LR.LogReg()
+LR.SVM()
