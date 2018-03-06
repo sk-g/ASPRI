@@ -217,37 +217,3 @@ if minutes > 60:
 print("time taken for running the notebook:\n {0} hours, {1} minutes and {2} seconds".format(hours,minutes,seconds))
 
 pickle.dump(final_embeddings,open('128dimsw2v','wb'))
-
-"""
-def plot_with_labels(low_dim_embs, labels, filename):
-	assert low_dim_embs.shape[0] >= len(labels), 'More labels than embeddings'
-	plt.figure(figsize=(20,20))  # in inches
-	for i, label in enumerate(labels):
-		x, y = low_dim_embs[i, :]
-		plt.scatter(x, y)
-		plt.annotate(label,
-								 xy=(x, y),
-								 xytext=(5, 2),
-								 textcoords='offset points',
-								 ha='right',
-								 va='bottom')
-
-	plt.show()
-	#plt.savefig(filename)try:
-	# pylint: disable=g-import-not-at-top
-try:
-	# pylint: disable=g-import-not-at-top
-	from sklearn.manifold import TSNE
-	import matplotlib.pyplot as plt
-	#%matplotlib inline
-	print("final_embeddings size",final_embeddings.shape)
-	tsne = TSNE(perplexity=30, n_components=2, init='pca', n_iter=5000, method='exact')
-	plot_only = final_embeddings.shape[0]//100
-	low_dim_embs = tsne.fit_transform(final_embeddings[:plot_only, :])
-	labels = [reverse_dictionary[i] for i in xrange(plot_only)]
-	plot_with_labels(low_dim_embs, labels, os.path.join(os.getcwd(), str("_"+str(num_steps)+".png")))
-
-except ImportError as ex:
-	print('Please install sklearn, matplotlib, and scipy to show embeddings.')
-	print(ex)    
-"""
