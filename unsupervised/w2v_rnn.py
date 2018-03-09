@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import collections,math,os,random,pickle,zipfile
+import collections,math,os,random,pickle,zipfile,sys
 from tempfile import gettempdir
 import numpy as np
 from six.moves import urllib
@@ -33,17 +33,34 @@ else:
 	lines = f.readlines()
 	lines = [i.strip() for i in lines]
 
+
+
+def addTokens(arr):
+	# function to add
+	# start token and
+	# end token to all sentences
+	# in array
+	print("\nAdding start and end tokens\n")
+	ttl = len(arr)
+	for i in range(ttl):
+		temp = arr[i].split(' ')
+		temp.insert(0,'START')
+		temp.append('END')
+		temp = ' '.join([word for word in temp])
+		arr[i] = temp
+		drawProgressBar(i/ttl)
+	return arr
+#lines = addTokens(lines)
 tokens = []
 for i in range(len(lines)):
 	splits = lines[i].split(' ')
 	for j in range(len(splits)):
 		tokens.append(splits[j])
 unique_tokens = set(tokens)
-lines_size = len(unique_tokens)
-print(len(unique_tokens))
-
+unique_words = len(unique_tokens)
+print("Number of unique ASes = {}".format(len(unique_tokens)-1))
 def build_dataset(words, n_words):
-	"""Process raw inputs into a dataset."""
+	print("""Process raw inputs into a dataset.""")
 	count = [['UNK', -1]]
 	#count = [[]]
 	count.extend(collections.Counter(words).most_common(n_words - 1))
@@ -63,18 +80,21 @@ def build_dataset(words, n_words):
 	reversed_dictionary = dict(zip(dictionary.values(), dictionary.keys()))
 	return data, count, dictionary, reversed_dictionary
 
-data, count, dictionary, reverse_dictionary = build_dataset(tokens,len(tokens))#lines,lines_size
+data, count, dictionary, reverse_dictionary = build_dataset(tokens,len(tokens))
+unique_words = len(lines)
 del lines  # Hint to reduce memory.
 """
 print('Most common words (+UNK)', count[:5])
 print('Least common words (+UNK)',count[-5:])
 print('Sample data', data[:10], [reverse_dictionary[i] for i in data[:10]])
 """
-
+pickle.dump(dictionary,open('tokenizedDic','wb'))
+pickle.dump(count,open('tokenizedCount','wb'))
 data_index = 0
 
 # Step 3: Function to generate a training batch for the skip-gram model.
 def generate_batch(batch_size, num_skips, skip_window):
+	#print("\n Generating Batches \n")
 	global data_index
 	assert batch_size % num_skips == 0
 	assert num_skips <= 2 * skip_window
@@ -106,10 +126,10 @@ def generate_batch(batch_size, num_skips, skip_window):
 
 # Step 4: Build and train a skip-gram model.
 
-batch_size = 1024
-embedding_size = 128  # Dimension of the embedding vector. 32. lets try higher dims
+batch_size = 256
+embedding_size = 64  # Dimension of the embedding vector. 32. lets try higher dims
 skip_window = 8       # How many words to consider left and right.
-num_skips = 4         # How many times to reuse an input to generate a label.
+num_skips = 2         # How many times to reuse an input to generate a label.
 num_sampled = 64      # Number of negative examples to sample.    
 
 
@@ -118,8 +138,8 @@ num_sampled = 64      # Number of negative examples to sample.
 # validation samples to the words that have a low numeric ID, which by
 # construction are also the most frequent. These 3 variables are used only for
 # displaying model accuracy, they don't affect calculation.
-valid_size = 32     # Random set of words to evaluate similarity on.
-valid_window = 1024  # Only pick dev samples in the head of the distribution.
+valid_size = 16     # Random set of words to evaluate similarity on.
+valid_window = 512  # Only pick dev samples in the head of the distribution.
 valid_examples = np.random.choice(valid_window, valid_size, replace=False)
 
 
@@ -136,14 +156,14 @@ with graph.as_default():
 	with tf.device('/gpu:0'):
 		# Look up embeddings for inputs.
 		embeddings = tf.Variable(
-				tf.random_uniform([lines_size, embedding_size], -1.0, 1.0))
+				tf.random_uniform([unique_words, embedding_size], -1.0, 1.0))#2.6k,embb_dim
 		embed = tf.nn.embedding_lookup(embeddings, train_inputs)
 
 		# Construct the variables for the NCE loss
 		nce_weights = tf.Variable(
-				tf.truncated_normal([lines_size, embedding_size],
+				tf.truncated_normal([unique_words, embedding_size],
 														stddev=1.0 / math.sqrt(embedding_size)))
-		nce_biases = tf.Variable(tf.zeros([lines_size]))
+		nce_biases = tf.Variable(tf.zeros([unique_words]))
 	
 	global_step = tf.Variable(0, trainable=False)
 	starter_learning_rate = 1.0
@@ -155,7 +175,7 @@ with graph.as_default():
 										 labels=train_labels,
 										 inputs=embed,
 										 num_sampled=num_sampled,
-										 num_classes=lines_size))
+										 num_classes=unique_words))
 
 	# Construct the SGD optimizer using a learning rate of 1.0.
 	optimizer = (tf.train.GradientDescentOptimizer(learning_rate).minimize(loss,global_step = global_step))
@@ -176,7 +196,7 @@ with graph.as_default():
 	init = tf.global_variables_initializer()
 
 # Step 5: Begin training.
-num_steps = 55001
+num_steps = 155001
 
 ## SGD ##
 
@@ -216,4 +236,4 @@ if minutes > 60:
 	minutes = minutes%60
 print("time taken for running the notebook:\n {0} hours, {1} minutes and {2} seconds".format(hours,minutes,seconds))
 
-pickle.dump(final_embeddings,open('128dimsw2v','wb'))
+pickle.dump(final_embeddings,open('tokenizedFE','wb'))

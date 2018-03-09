@@ -51,9 +51,7 @@ class preprocess(object):
 			temp = ' '.join([str(i) for i in temp])
 			lines[i] = temp
 		return lines
-	def createTrainingData(self):
-		X = np.zeros(len(self.lines), self.timesteps , self.maxlen) 
-		y = np.zeros(len(self.lines), self.timesteps , self.maxlen) 
+
 	def onehotcoding(self,arr):
 		# return one hot 
 		return arr
@@ -62,26 +60,51 @@ class preprocess(object):
 		self.embedding_dim = embedding_dim
 		if self.embedding_dim == 32:
 			self.final_embeddings = pickle.load(open(r'..\supervised\gcp_fe','rb'))
-		elif self.embedding_dim == 32:
+		elif self.embedding_dim == 128:
 			self.final_embeddings = pickle.load(open(r'..\supervised\128dimsw2v','rb'))
-		return self.final_embeddings
-	
-	def encode(arr):
-		pass
+		self.dictionary = pickle.load(open(r'..\supervised\gcp_dictionary','rb'))
+		self.reverse_dictionary = pickle.load(open(r'..\supervised\gcp_reverse_dictionary','rb'))
+		
+		print("Word2Vec embedding space has the shape: {0}\n".format(self.final_embeddings.shape))
 
-
+		embedding_matrix = np.zeros((len(self.dictionary), embedding_dim))
+		for i in list(self.reverse_dictionary.keys()):
+			embedding_vector = self.final_embeddings[i-1]#.reshape((embedding_dim,1))
+			if embedding_vector is not None:
+				# words not found in embedding index will be all-zeros.
+				embedding_matrix[i-1] = embedding_vector
+		self.embedding_matrix = embedding_matrix	
+	def encode(self,arr):
+		nd_array = []
+		for i in range(self.maxlen):
+			nd_array.append(np.zeros(shape=(self.embedding_dim,1)))
+		new_array = []
+		for i in range(len(arr)):
+			new_array.append(nd_array)
+		new_array = np.asarray(new_array)
+		c = 0
+		for i in arr:
+			splits = i.split(' ')
+			for j in range(len(splits)):
+				if splits[j] in self.dictionary:
+					new_array[c,j] = self.final_embeddings[self.dictionary[str(splits[j])]-1].reshape(self.embedding_dim,1)
+			else:
+				new_array[c,j] = self.final_embeddings[self.dictionary['UNK']].reshape(self.embedding_dim,1)#setting unkown word to UNK
+			c += 1
+		self.encoded = new_array.reshape(new_array.shape)
+	def build_model(self):
+		model = Sequential()
+		model.add(LSTM(64, dropout=0.2, recurrent_dropout=0.2,input_shape = (self.encoded.shape[1],self.encoded.shape[2]),return_sequences = True ))
+		model.add(LSTM(64, dropout=0.2, recurrent_dropout=0.2))
+		model.compile(loss='categorical_crossentropy',optimizer = 'adam')
+		model.summary()
+		model.fit(self.encoded,self.encoded, nb_epoch = 10)
 
 if __name__ == '__main__':
 		f1 = preprocess(r'M:\Course stuff\ASPRI\data\PCH\paths\11012018.txt')
 		f2 = preprocess(r'M:\Course stuff\ASPRI\data\PCH\paths\24012018.txt')
 		paths = f1.load_text()
 		unique_paths, unique_as = f1.unique(paths)
-		"""								
-		paths = load_text(r'M:\Course stuff\ASPRI\data\PCH\paths\11012018.txt')
-		unique_paths, unique_as = unique(paths)
-		print(max([len(i.split(' ')) for i in unique_paths]))
-		paths = load_text(r'M:\Course stuff\ASPRI\data\PCH\paths\24012018.txt')
-		unique_paths, unique_as = unique(paths)
-		print(max([len(i.split(' ')) for i in unique_paths]))
-
-		"""
+		f1.loadEmbedding()
+		f1.encode(paths)
+		f1.build_model()

@@ -137,5 +137,6 @@ print(arr_[-5:])
 random_path = '094 I am an invalid route 4826 4809'
 print("Let's see Perplexity of random path \'{}\' with invalid numbers:\n".format(random_path))
 print(lm.perplexity(random_path).round(3))
-
+print(lm.relative_perplexity(random_path).round(3))
 print("perplexity of a random path from training set:",lm.perplexity(lines[random.randint(10000,15000)]).round(3))
+print(lm.min_perplexity,lm.max_perplexity)

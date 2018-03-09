@@ -1,0 +1,81 @@
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+lstm_1 (LSTM)                (None, 64)                24832     
+_________________________________________________________________
+dense_1 (Dense)              (None, 1)                 65        
+=================================================================
+Total params: 24,897
+Trainable params: 24,897
+Non-trainable params: 0
+_________________________________________________________________
+Confusion Matrix on test set:
+		true negatives = 35324
+		false positives = 11163
+		false negatives = 448
+		true positives = 172021
+		accuracy = 94.69710809477704
+
+__________________________________
+Confusion Matrix on test set:
+		true negatives = 15193
+		false positives = 4785
+		false negatives = 190
+		true positives = 73671
+		accuracy = 94.69836635087756
+
+__________________________________
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+lstm_2 (LSTM)                (None, 256)               295936    
+_________________________________________________________________
+dense_2 (Dense)              (None, 1)                 257       
+=================================================================
+Total params: 296,193
+Trainable params: 296,193
+Non-trainable params: 0
+_________________________________________________________________
+Confusion Matrix on test set:
+		true negatives = 36357
+		false positives = 10130
+		false negatives = 361
+		true positives = 172108
+		accuracy = 95.20862639069037
+
+__________________________________
+Confusion Matrix on test set:
+		true negatives = 15635
+		false positives = 4343
+		false negatives = 185
+		true positives = 73676
+		accuracy = 95.17471413804495
+
+__________________________________
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+lstm_3 (LSTM)                (None, 512)               1116160   
+_________________________________________________________________
+dense_3 (Dense)              (None, 1)                 513       
+=================================================================
+Total params: 1,116,673
+Trainable params: 1,116,673
+Non-trainable params: 0
+_________________________________________________________________
+Confusion Matrix on test set:
+		true negatives = 37222
+		false positives = 9265
+		false negatives = 1014
+		true positives = 171455
+		accuracy = 95.30544949670254
+
+__________________________________
+Confusion Matrix on test set:
+		true negatives = 15980
+		false positives = 3998
+		false negatives = 474
+		true positives = 73387
+		accuracy = 95.23439081831648
+
+__________________________________
