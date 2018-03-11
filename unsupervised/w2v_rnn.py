@@ -9,17 +9,7 @@ from six.moves import urllib
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '4'
-
-def drawProgressBar(percent, barLen = 50):
-	sys.stdout.write("\r")
-	progress = ""
-	for i in range(barLen):
-		if i<int(barLen * percent):
-			progress += "="
-		else:
-			progress += " "
-	sys.stdout.write("[ %s ] %.2f%%" % (progress, percent * 100))
-	sys.stdout.flush()
+from language_model import drawProgressBar
 
 if os.name != 'posix':
 	import matplotlib.pyplot

@@ -2,7 +2,7 @@ import os,time,sys,pickle,nltk,statistics,re,os,time,sys,pickle,nltk,statistics,
 import pandas as pd
 import numpy as np
 from collections import Counter
-
+from language_model import drawProgressBar
 if os.name != 'posix':
 	f = open(r'..\data\PCH\paths\11012018.txt')
 	lines = f.readlines()
@@ -11,16 +11,6 @@ else:
 	f = open('../data/PCH/paths/11012018.txt')
 	lines = f.readlines()
 	lines = [i.strip() for i in lines]
-def drawProgressBar(percent, barLen = 50):
-	sys.stdout.write("\r")
-	progress = ""
-	for i in range(barLen):
-		if i<int(barLen * percent):
-			progress += "="
-		else:
-			progress += " "
-	sys.stdout.write("[ %s ] %.2f%%" % (progress, percent * 100))
-	sys.stdout.flush()
 
 def unique_lines(arr):
 	return (list(set(arr)))
