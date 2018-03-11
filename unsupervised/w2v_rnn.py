@@ -81,7 +81,7 @@ def build_dataset(words, n_words):
 	return data, count, dictionary, reversed_dictionary
 
 data, count, dictionary, reverse_dictionary = build_dataset(tokens,len(tokens))
-unique_words = len(lines)
+#unique_words = len(lines)
 del lines  # Hint to reduce memory.
 """
 print('Most common words (+UNK)', count[:5])
@@ -128,9 +128,9 @@ def generate_batch(batch_size, num_skips, skip_window):
 
 batch_size = 256
 embedding_size = 64  # Dimension of the embedding vector. 32. lets try higher dims
-skip_window = 8       # How many words to consider left and right.
+skip_window = 4       # How many words to consider left and right.
 num_skips = 2         # How many times to reuse an input to generate a label.
-num_sampled = 64      # Number of negative examples to sample.    
+num_sampled = 30      # Number of negative examples to sample.    
 
 
 
@@ -156,7 +156,7 @@ with graph.as_default():
 	with tf.device('/gpu:0'):
 		# Look up embeddings for inputs.
 		embeddings = tf.Variable(
-				tf.random_uniform([unique_words, embedding_size], -1.0, 1.0))#2.6k,embb_dim
+				tf.random_uniform([unique_words, embedding_size], -1.0, 1.0))/np.sqrt(embedding_size)#2.6k,embb_dim
 		embed = tf.nn.embedding_lookup(embeddings, train_inputs)
 
 		# Construct the variables for the NCE loss
@@ -178,10 +178,10 @@ with graph.as_default():
 										 num_classes=unique_words))
 
 	# Construct the SGD optimizer using a learning rate of 1.0.
-	optimizer = (tf.train.GradientDescentOptimizer(learning_rate).minimize(loss,global_step = global_step))
+	#optimizer = (tf.train.GradientDescentOptimizer(learning_rate).minimize(loss,global_step = global_step))
 
 	# What if we use AdamOptimizer
-	#optimizer = (tf.train.AdamOptimizer(learning_rate).minimize(loss,global_step = global_step))
+	optimizer = (tf.train.AdamOptimizer(learning_rate).minimize(loss,global_step = global_step))
 	
 	# Compute the cosine similarity between minibatch examples and all embeddings.
 	norm = tf.sqrt(tf.reduce_sum(tf.square(embeddings),
@@ -236,4 +236,4 @@ if minutes > 60:
 	minutes = minutes%60
 print("time taken for running the notebook:\n {0} hours, {1} minutes and {2} seconds".format(hours,minutes,seconds))
 
-pickle.dump(final_embeddings,open('tokenizedFE','wb'))
+pickle.dump(final_embeddings,open('final_wordEmbeddings','wb'))

@@ -1,0 +1,160 @@
+Confusion Matrix on train set, LSTM 64 + Dense:
+		true negatives = 36021
+		false positives = 10516
+		false negatives = 793
+		true positives = 171626
+		accuracy = 94.83503534956795
+
+__________________________________
+Confusion Matrix on test set, LSTM 64 + Dense:
+		true negatives = 15395
+		false positives = 4533
+		false negatives = 344
+		true positives = 73567
+		accuracy = 94.80280054135274
+
+__________________________________
+Confusion Matrix on train set, LSTM 128 + Dense:
+		true negatives = 35969
+		false positives = 10568
+		false negatives = 286
+		true positives = 172133
+		accuracy = 95.04283965728274
+
+__________________________________
+Confusion Matrix on test set, LSTM 128 + Dense:
+		true negatives = 15379
+		false positives = 4549
+		false negatives = 137
+		true positives = 73774
+		accuracy = 95.00634064727885
+
+__________________________________
+Confusion Matrix on train set, LSTM 256 + Dense:
+		true negatives = 36933
+		false positives = 9604
+		false negatives = 871
+		true positives = 171548
+		accuracy = 95.2159337949177
+
+__________________________________
+Confusion Matrix on test set, LSTM 256 + Dense:
+		true negatives = 15819
+		false positives = 4109
+		false negatives = 402
+		true positives = 73509
+		accuracy = 95.19283027312738
+
+__________________________________
+Confusion Matrix on train set, LSTM 512 + Dense:
+		true negatives = 37154
+		false positives = 9383
+		false negatives = 596
+		true positives = 171823
+		accuracy = 95.44246332596504
+
+__________________________________
+Confusion Matrix on test set, LSTM 512 + Dense:
+		true negatives = 15884
+		false positives = 4044
+		false negatives = 290
+		true positives = 73621
+		accuracy = 95.38145120898561
+
+__________________________________
+Confusion Matrix on train set, LSTM 64 + Dense 128:
+		true negatives = 35529
+		false positives = 11008
+		false negatives = 506
+		true positives = 171913
+		accuracy = 94.74140923290524
+
+__________________________________
+Confusion Matrix on test set, LSTM 64 + Dense 128:
+		true negatives = 15155
+		false positives = 4773
+		false negatives = 220
+		true positives = 73691
+		accuracy = 94.67918456079029
+
+__________________________________
+Confusion Matrix on train set, LSTM 64 + 2xDense 128:
+		true negatives = 36063
+		false positives = 10474
+		false negatives = 839
+		true positives = 171580
+		accuracy = 94.83320849851111
+
+__________________________________
+Confusion Matrix on test set, LSTM 64 + 2xDense 128:
+		true negatives = 15405
+		false positives = 4523
+		false negatives = 350
+		true positives = 73561
+		accuracy = 94.80706316137214
+
+__________________________________
+Confusion Matrix on train set, LSTM 64 +2xDense + BatchNormalization:
+		true negatives = 35551
+		false positives = 10986
+		false negatives = 409
+		true positives = 172010
+		accuracy = 94.79575805184604
+
+__________________________________
+Confusion Matrix on test set, LSTM 64 + 2xDense + BatchNormalization:
+		true negatives = 15173
+		false positives = 4755
+		false negatives = 169
+		true positives = 73742
+		accuracy = 94.75271475612485
+
+__________________________________
+Confusion Matrix on train set, LSTM 128 + LSTM 64 + LSTM 32 + Dense 16 + BatchNormalization:
+		true negatives = 36384
+		false positives = 10100
+		false negatives = 418
+		true positives = 172054
+		accuracy = 95.19629514605674
+
+__________________________________
+Confusion Matrix on test set, LSTM 128 + LSTM 64 + LSTM 32 + Dense 16 + BatchNormalization:
+		true negatives = 15683
+		false positives = 4298
+		false negatives = 197
+		true positives = 73661
+		accuracy = 95.20988075320496
+
+__________________________________
+Confusion Matrix on train set, GRU 128 + GRU 64 + GRU 32 + Dense 16 + BatchNormalization:
+		true negatives = 36692
+		false positives = 9779
+		false negatives = 691
+		true positives = 171794
+		accuracy = 95.21821735873874
+
+__________________________________
+Confusion Matrix on test set, GRU 128 + GRU 64 + GRU 32 + Dense 16 + BatchNormalization:
+		true negatives = 15830
+		false positives = 4164
+		false negatives = 309
+		true positives = 73536
+		accuracy = 95.23332516331163
+
+__________________________________
+Confusion Matrix on train set, GRU 512 + Dense:
+		true negatives = 36792
+		false positives = 9679
+		false negatives = 227
+		true positives = 172258
+		accuracy = 95.47580335775224
+
+__________________________________
+Confusion Matrix on test set, GRU 512 + Dense:
+		true negatives = 15879
+		false positives = 4115
+		false negatives = 117
+		true positives = 73728
+		accuracy = 95.49014801948017
+
+__________________________________

@@ -114,7 +114,7 @@ vocab_size = len(dictionary) #unique tokens for this file
 max_features = vocab_size
 epochs = 5 #training steps
 verbose = 1
-batch_size = 128
+batch_size = 256
 
 def encode(train,test,embedding_dim = 32):
 	#print("Embedding Dimension = ", embedding_dim)
@@ -200,8 +200,9 @@ def cnfmx(y_true,y_pred,strx):
 
 
 def main(x_train,y_train,x_test,y_test):
+	"""
 	print('Build first model...')
-
+	
 	model = Sequential()
 	model.add(LSTM(64, dropout=0.2, recurrent_dropout=0.2,input_shape = (encoded_train.shape[1],encoded_train.shape[2])))
 	model.add(Dense(1, activation='sigmoid'))
@@ -313,6 +314,7 @@ def main(x_train,y_train,x_test,y_test):
 	cnfmx(y_test,predictions,"test set, LSTM 64 + 2xDense + BatchNormalization")
 	print('\nTest score:', score_lstm_sigmoid_FC)
 	print('\nTest accuracy:', acc_lstm_sigmoid_FC)	
+	
 
 	model = Sequential()
 	model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2, input_shape = (encoded_train.shape[1],encoded_train.shape[2]), return_sequences = True))
@@ -324,12 +326,13 @@ def main(x_train,y_train,x_test,y_test):
 	model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
 	model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose)
 	score_lstm_sigmoid_FC, acc_lstm_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
+	predictions = model.predict(x_train)
 	cnfmx(y_train,predictions,"train set, LSTM 128 + LSTM 64 + LSTM 32 + Dense 16 + BatchNormalization")
 	predictions = model.predict(x_test)
 	cnfmx(y_test,predictions,"test set, LSTM 128 + LSTM 64 + LSTM 32 + Dense 16 + BatchNormalization")
 	print('\nTest score:', score_lstm_sigmoid_FC)
 	print('\nTest accuracy:', acc_lstm_sigmoid_FC)
-
+	"""	
 	model = Sequential()
 	model.add(GRU(128, dropout=0.2, recurrent_dropout=0.2, input_shape = (encoded_train.shape[1],encoded_train.shape[2]), return_sequences = True))
 	model.add(GRU(64, dropout=0.2, recurrent_dropout=0.2,return_sequences = True))
@@ -339,12 +342,13 @@ def main(x_train,y_train,x_test,y_test):
 	model.add(Dense(1, activation='sigmoid'))
 	model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
 	model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose)
-	score_GRU_sigmoid_FC, acc_GRU_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
+	predictions = model.predict(x_train)
+	#score_GRU_sigmoid_FC, acc_GRU_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
 	cnfmx(y_train,predictions,"train set, GRU 128 + GRU 64 + GRU 32 + Dense 16 + BatchNormalization")
 	predictions = model.predict(x_test)
 	cnfmx(y_test,predictions,"test set, GRU 128 + GRU 64 + GRU 32 + Dense 16 + BatchNormalization")
-	print('\nTest score:', score_GRU_sigmoid_FC)
-	print('\nTest accuracy:', acc_GRU_sigmoid_FC)		
+	#print('\nTest score:', score_GRU_sigmoid_FC)
+	#print('\nTest accuracy:', acc_GRU_sigmoid_FC)		
 
 
 	model = Sequential()
@@ -353,11 +357,11 @@ def main(x_train,y_train,x_test,y_test):
 	model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
 	print('\nTrain...\n')
 	model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose = verbose)
-	score_GRU_sigmoid_FC, acc_GRU_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
+	#score_GRU_sigmoid_FC, acc_GRU_sigmoid_FC = model.evaluate(x_test, y_test,batch_size=batch_size)
 	predictions = model.predict(x_train)
 	cnfmx(y_train,predictions,"train set, GRU 512 + Dense")
-	print('\nTest score:', score_GRU_sigmoid_FC)
-	print('\nTest accuracy:', acc_GRU_sigmoid_FC)
+	#print('\nTest score:', score_GRU_sigmoid_FC)
+	#print('\nTest accuracy:', acc_GRU_sigmoid_FC)
 	predictions = model.predict(x_test)
 	cnfmx(y_test,predictions,"test set, GRU 512 + Dense")
 	

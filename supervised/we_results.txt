@@ -1,0 +1,128 @@
+Confusion Matrix on train set, LSTM 32 + Dense:
+			true negatives = 14304
+			false positives = 35461
+			false negatives = 28
+			true positives = 184803
+			accuracy = 84.87229108765708
+
+__________________________________
+Confusion Matrix on train set, LSTM 32 + Dense:
+			true negatives = 4887
+			false positives = 11813
+			false negatives = 10
+			true positives = 61489
+			accuracy = 84.88088082967813
+
+__________________________________
+Confusion Matrix on train set, LSTM 32 + Dense:
+			true negatives = 14296
+			false positives = 35469
+			false negatives = 24
+			true positives = 184807
+			accuracy = 84.8705860287473
+
+__________________________________
+Confusion Matrix on train set, LSTM 32 + Dense:
+			true negatives = 4876
+			false positives = 11824
+			false negatives = 15
+			true positives = 61484
+			accuracy = 84.86042020997711
+
+__________________________________
+Confusion Matrix on train set, LSTM 64 + Dense:
+			true negatives = 21209
+			false positives = 28556
+			false negatives = 596
+			true positives = 184235
+			accuracy = 87.5735306654845
+
+__________________________________
+Confusion Matrix on train set, LSTM 64 + Dense:
+			true negatives = 6934
+			false positives = 9766
+			false negatives = 375
+			true positives = 61124
+			accuracy = 87.03180347574776
+
+__________________________________
+Confusion Matrix on train set, LSTM 128 + Dense:
+			true negatives = 37159
+			false positives = 12606
+			false negatives = 59
+			true positives = 184772
+			accuracy = 94.60135722689219
+
+__________________________________
+Confusion Matrix on train set, LSTM 128 + Dense:
+			true negatives = 12331
+			false positives = 4369
+			false negatives = 46
+			true positives = 61453
+			accuracy = 94.35414775125001
+
+__________________________________
+Confusion Matrix on train set, 3xLSTM(12) + Dense 16 + BN + Dense:
+			true negatives = 41152
+			false positives = 8613
+			false negatives = 87
+			true positives = 184744
+			accuracy = 96.2914968712169
+
+__________________________________
+Confusion Matrix on train set, 3xLSTM(12) + Dense 16 + BN + Dense:
+			true negatives = 13446
+			false positives = 3254
+			false negatives = 139
+			true positives = 61360
+			accuracy = 95.66106983465262
+
+__________________________________
+Confusion Matrix on train set, 64 ED 3xLSTM(12) + Dense 16 + BN + Dense:
+			true negatives = 41207
+			false positives = 8558
+			false negatives = 16
+			true positives = 184815
+			accuracy = 96.34520622687513
+
+__________________________________
+Confusion Matrix on train set, 64 ED 3xLSTM(12) + Dense 16 + BN + Dense:
+			true negatives = 13490
+			false positives = 3210
+			false negatives = 75
+			true positives = 61424
+			accuracy = 95.7991790176345
+
+__________________________________
+Confusion Matrix on train set, 128 ED 3xLSTM(12) + Dense 16 + BN + Dense:
+			true negatives = 41596
+			false positives = 8169
+			false negatives = 28
+			true positives = 184803
+			accuracy = 96.50590802912241
+
+__________________________________
+Confusion Matrix on train set, 128 ED 3xLSTM(12) + Dense 16 + BN + Dense:
+			true negatives = 13661
+			false positives = 3039
+			false negatives = 73
+			true positives = 61426
+			accuracy = 96.02040946815177
+
+__________________________________
+Confusion Matrix on train set,  128 ED + CNN + 3xLSTM(12) + Dense 16 + BN + Dense:
+			true negatives = 41980
+			false positives = 7785
+			false negatives = 24
+			true positives = 184807
+			accuracy = 96.67129874337158
+
+__________________________________
+Confusion Matrix on train set, 128 ED + CNN + 3xLSTM(12) + Dense 16 + BN + Dense:
+			true negatives = 13838
+			false positives = 2862
+			false negatives = 124
+			true positives = 61375
+			accuracy = 96.1815368482973
+
+__________________________________

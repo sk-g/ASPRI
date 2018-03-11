@@ -131,18 +131,18 @@ def generate_batch(batch_size, num_skips, skip_window):
 	data_index = (data_index + len(data) - span) % len(data)
 	return batch, labels
 
-batch, labels = generate_batch(batch_size=8, num_skips=2, skip_window=1)
-#for i in range(8):
-#	print(batch[i], reverse_dictionary[batch[i]],
-#				'->', labels[i, 0], reverse_dictionary[labels[i, 0]])
-
+batch, labels = generate_batch(batch_size=8, num_skips=2, skip_window=4)
+for i in range(8):
+	print(batch[i], reverse_dictionary[batch[i]],
+				'->', labels[i, 0], reverse_dictionary[labels[i, 0]])
+"""
 # Step 4: Build and train a skip-gram model.
 
 batch_size = 256
-embedding_size = 512  # Dimension of the embedding vector.
-skip_window = 1       # How many words to consider left and right.
+embedding_size = 128  # Dimension of the embedding vector.
+skip_window = 4       # How many words to consider left and right.
 num_skips = 2         # How many times to reuse an input to generate a label.
-num_sampled = 64      # Number of negative examples to sample.
+num_sampled = 16      # Number of negative examples to sample.
 
 # We pick a random validation set to sample nearest neighbors. Here we limit the
 # validation samples to the words that have a low numeric ID, which by
@@ -245,15 +245,7 @@ with tf.Session(graph=graph) as session:
 		#			log_str = '%s %s,' % (log_str, close_word)
 		#		print(log_str)
 	final_embeddings = normalized_embeddings.eval()
-	"""
-	import sys
-				sys.stdout = open(filename+"final_embeddings_2.txt",'w+')
-				for i in range(len(final_embeddings)):
-					print(final_embeddings[i])
-				#f = open("final_embeddings.txt",'w+')
-				#f.write(final_embeddings)
-				sys.stdout = sys.__stdout__
-	"""
+
 # Step 6: Visualize the embeddings.
 
 
@@ -287,4 +279,4 @@ try:
 
 except ImportError as ex:
 	print('Please install sklearn, matplotlib, and scipy to show embeddings.')
-	print(ex)
+	print(ex)"""
