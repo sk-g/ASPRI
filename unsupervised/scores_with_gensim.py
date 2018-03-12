@@ -34,6 +34,7 @@ def main():
 	parser.add_argument('--fake_paths',type=str,default='11012018_f.txt',
 						help='file containing fake paths')
 	args = parser.parse_args()
+	print(args)
 	train(args)
 def train(args):
 	print("\nInitialize model with {}\n".format(args.iter))
@@ -41,22 +42,20 @@ def train(args):
 		true_file = str(args.true_paths)
 		fake_file = str(args.fake_paths)
 		sentences = [i.strip() for i in open(true_file,'r').readlines()]
-
+		sentences = [i.split(' ') for i in sentences]
 		model = gensim.models.Word2Vec(sentences, min_count=args.min_count,size = args.size,hs = 1, sg = args.sg,seed = 694,\
 			window = args.window, negative = 0,iter = args.iter,workers=1)
-		#f = open('gensim scores.txt','a')
-		#sys.stdout = open('gensim scores.txt','w')
-		#print([(i,gensim.models.deprecated.word2vec.score_sentence_sg(model,i)) for i in sentences])
+		model.train(sentences, total_examples=model.corpus_count, epochs=model.iter)
 		ttl = len(sentences)
 		true_scores = []
 		#print("\nScoring valid paths ...\n")
-		
 		true_scores = np.array(model.score(sentences,len(sentences)))# log likelihoods
 
 		del sentences
 
-		#fake_sentences = [i.split(' ') for i in list(set([i.strip() for i in open('11012018_f.txt','r').readlines()]))]
-		fake_sentences = [i.split(' ') for i in (([i.strip() for i in open(fake_file,'r').readlines()]))]
+		fake_sentences = [i.split(' ') for i in list(set([i.strip() for i in open(fake_file,'r').readlines()]))]
+		#fake_sentences = [i.split(' ') for i in (([i.strip() for i in open(fake_file,'r').readlines()]))]
+		#fake_sentences = [i.strip() for i in open(fake_file,'r').readlines()]
 		fake_scores = []
 		ttl = len(fake_sentences)
 		fake_scores = np.array(model.score(fake_sentences,ttl)) # log likelihoods
@@ -64,8 +63,10 @@ def train(args):
 		fake_scores = fake_scores.astype(np.float64)
 		true_scores,fake_scores = np.exp(true_scores),np.exp(fake_scores)#exponential to give softmax probs. Not required
 		del fake_sentences
+
 		#print("Maximum,minimum log likelihood over all valid sentences = {},{}\n\
 		#	Maximum,minimum log likelihood over all invalid sentences = {},{}".format(max(true_scores),min(true_scores),max(fake_scores),min(fake_scores)))
+
 		return true_scores,fake_scores
 
 	def loadScores():
@@ -98,7 +99,7 @@ def train(args):
 	predictions(true_scores,fake_scores)
 	## sanity check by giving true scores only
 	## accuracy should be 0 in this call
-	predictions(true_scores,true_scores)
+	#predictions(true_scores,true_scores)
 
 
 	def dumpScores():
