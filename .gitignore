@@ -1,6 +1,12 @@
 *.gz
 *.28.ipynb_checkpoints
 *.ipynb
-!keras_supervised_LSTM.ipynb
-!losses.ipynb
+keras_supervised_LSTM.ipynb
+losses.ipynb
 /supervised/logs/
+/unsupervised/__pycache__
+/unsupervised/tokenized*
+/unsupervised/final_*
+/supervised/__pycache__
+/supervised/.ipynb_checkpoints
+/supervised/traditional_ML.py
