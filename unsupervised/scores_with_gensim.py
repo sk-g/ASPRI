@@ -11,7 +11,7 @@ import os,sys,time,pickle,statistics,time
 from language_model import drawProgressBar
 import numpy as np
 from gensim.models.word2vec import *
-#logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+#logging.basicConfig(format='%(levelname)s : %(message)s', level=logging.INFO)
 
 def main():
 	parser = argparse.ArgumentParser()
@@ -41,32 +41,39 @@ def train(args):
 	def build(iter = args.iter):
 		true_file = str(args.true_paths)
 		fake_file = str(args.fake_paths)
-		sentences = [i.strip() for i in open(true_file,'r').readlines()]
+		sentences = list(set([i.strip() for i in open(true_file,'r').readlines()]))
 		sentences = [i.split(' ') for i in sentences]
-		model = gensim.models.Word2Vec(sentences, min_count=args.min_count,size = args.size,hs = 1, sg = args.sg,seed = 694,\
-			window = args.window, negative = 0,iter = args.iter,workers=1)
-		model.train(sentences, total_examples=model.corpus_count, epochs=model.iter)
 		ttl = len(sentences)
-		true_scores = []
-		#print("\nScoring valid paths ...\n")
-		true_scores = np.array(model.score(sentences,len(sentences)))# log likelihoods
+
+
+		sentences = LineSentence(open(true_file,'r'))
+		model = gensim.models.Word2Vec(compute_loss = True, min_count=args.min_count,size = args.size,hs = 1, sg = args.sg,seed = 694,\
+			window = args.window, negative = 0,iter = 1,workers=1)		
+		
+		model.build_vocab(sentences)
+		model.train(sentences, compute_loss = False,total_examples=model.corpus_count, epochs=args.iter)
+		
+
+		true_scores,fake_scores = [],[]
+
+		true_scores = np.array(model.score(sentences,ttl))# log likelihoods
 
 		del sentences
 
+		
 		fake_sentences = [i.split(' ') for i in list(set([i.strip() for i in open(fake_file,'r').readlines()]))]
-		#fake_sentences = [i.split(' ') for i in (([i.strip() for i in open(fake_file,'r').readlines()]))]
-		#fake_sentences = [i.strip() for i in open(fake_file,'r').readlines()]
-		fake_scores = []
 		ttl = len(fake_sentences)
+		
+		#fake_sentences = LineSentence(open(fake_file,'r'))
 		fake_scores = np.array(model.score(fake_sentences,ttl)) # log likelihoods
 		true_scores = true_scores.astype(np.float64)#cast to float64 type otherwise rounds off
 		fake_scores = fake_scores.astype(np.float64)
 		true_scores,fake_scores = np.exp(true_scores),np.exp(fake_scores)#exponential to give softmax probs. Not required
 		del fake_sentences
-
+		#print("\nmodel.doesnt_match(6939 7545 7545 7545 7545 4651)\n",model.wv.doesnt_match("6939 7545 7545 7545 7545 4651".split()))
 		#print("Maximum,minimum log likelihood over all valid sentences = {},{}\n\
 		#	Maximum,minimum log likelihood over all invalid sentences = {},{}".format(max(true_scores),min(true_scores),max(fake_scores),min(fake_scores)))
-
+		model.save(str(args.size)+'_'+str(args.window)+'_'+str(args.iter))
 		return true_scores,fake_scores
 
 	def loadScores():
@@ -90,8 +97,8 @@ def train(args):
 							#and their score is beyond correct range
 			else:
 				wrong += 1
-		print("Total:{}".format(correct+wrong))
-		print("Correct = {}\nWrong = {}\nAccuracy = {}\n".format(correct,wrong,correct/(correct+wrong)))
+		#print("Total:{}".format(correct+wrong))
+		print("{}/{} Correct.\tAccuracy = {}\n".format(correct,wrong,100*correct/(correct+wrong)))
 
 	true_scores,fake_scores = build()
 	print("\n")

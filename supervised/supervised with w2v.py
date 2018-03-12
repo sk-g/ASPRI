@@ -1,5 +1,5 @@
 from __future__ import print_function
-import os,re,time,sys,os,math,random,time,pickle
+import os,re,time,sys,os,math,random,time,pickle,keras
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import tensorflow as tf
 from tensorflow.contrib import rnn
@@ -14,7 +14,8 @@ from keras.layers.embeddings import Embedding
 from keras.preprocessing import sequence
 from sklearn.model_selection import train_test_split as split
 from sklearn.metrics import confusion_matrix
-
+from keras.layers.convolutional import Conv1D
+from keras.layers.convolutional import MaxPooling1D
 start = time.time()
 
 
@@ -114,7 +115,7 @@ vocab_size = len(dictionary) #unique tokens for this file
 max_features = vocab_size
 epochs = 5 #training steps
 verbose = 1
-batch_size = 256
+batch_size = 1024
 
 def encode(train,test,embedding_dim = 32):
 	#print("Embedding Dimension = ", embedding_dim)
@@ -332,7 +333,6 @@ def main(x_train,y_train,x_test,y_test):
 	cnfmx(y_test,predictions,"test set, LSTM 128 + LSTM 64 + LSTM 32 + Dense 16 + BatchNormalization")
 	print('\nTest score:', score_lstm_sigmoid_FC)
 	print('\nTest accuracy:', acc_lstm_sigmoid_FC)
-	"""	
 	model = Sequential()
 	model.add(GRU(128, dropout=0.2, recurrent_dropout=0.2, input_shape = (encoded_train.shape[1],encoded_train.shape[2]), return_sequences = True))
 	model.add(GRU(64, dropout=0.2, recurrent_dropout=0.2,return_sequences = True))
@@ -364,6 +364,23 @@ def main(x_train,y_train,x_test,y_test):
 	#print('\nTest accuracy:', acc_GRU_sigmoid_FC)
 	predictions = model.predict(x_test)
 	cnfmx(y_test,predictions,"test set, GRU 512 + Dense")
+	"""
+	callbacks = [keras.callbacks.TensorBoard(log_dir = 'logs')]
+	model = Sequential()
+	model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu', input_shape = (encoded_train.shape[1],encoded_train.shape[2])))
+	model.add(MaxPooling1D(pool_size=2))
+	model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2, return_sequences = True))
+	model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2,return_sequences = True))
+	model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2))
+	model.add(Dense(16, activation='sigmoid'))
+	model.add(BatchNormalization())
+	model.add(Dense(1, activation='sigmoid'))
+	model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
+	model.fit(x_train,y_train,batch_size=batch_size,epochs=epochs,verbose = verbose,callbacks = callbacks)
+	predictions = model.predict(x_train)
+	cnfmx(y_train,predictions,"train set,  128 ED + CNN + 3xLSTM(12) + Dense 16 + BN + Dense")
+	predictions = model.predict(x_test)
+	cnfmx(y_test,predictions,"train set, 128 ED + CNN + 3xLSTM(12) + Dense 16 + BN + Dense")
 	
 
 if __name__ == '__main__':
