@@ -33,11 +33,13 @@ def main():
 						help='file containing valid paths')
 	parser.add_argument('--fake_paths',type=str,default='11012018_f.txt',
 						help='file containing fake paths')
+	parser.add_argument('--save',type=int,default=0,
+						help='save model')
 	args = parser.parse_args()
-	print(args)
+	#print(args)
 	train(args)
 def train(args):
-	print("\nInitialize model with {}\n".format(args.iter))
+	#print("\nInitialize model with {}\n".format(args.iter))
 	def build(iter = args.iter):
 		true_file = str(args.true_paths)
 		fake_file = str(args.fake_paths)
@@ -49,7 +51,7 @@ def train(args):
 		sentences = LineSentence(open(true_file,'r'))
 		model = gensim.models.Word2Vec(compute_loss = True, min_count=args.min_count,size = args.size,hs = 1, sg = args.sg,seed = 694,\
 			window = args.window, negative = 0,iter = 1,workers=1)		
-		
+		#model = gensim.models.Word2Vec.load('128_1_100')
 		model.build_vocab(sentences)
 		model.train(sentences, compute_loss = False,total_examples=model.corpus_count, epochs=args.iter)
 		
@@ -73,7 +75,8 @@ def train(args):
 		#print("\nmodel.doesnt_match(6939 7545 7545 7545 7545 4651)\n",model.wv.doesnt_match("6939 7545 7545 7545 7545 4651".split()))
 		#print("Maximum,minimum log likelihood over all valid sentences = {},{}\n\
 		#	Maximum,minimum log likelihood over all invalid sentences = {},{}".format(max(true_scores),min(true_scores),max(fake_scores),min(fake_scores)))
-		model.save(str(args.size)+'_'+str(args.window)+'_'+str(args.iter))
+		if args.save:
+			model.save(str(args.size)+'_'+str(args.window)+'_'+str(args.iter))
 		return true_scores,fake_scores
 
 	def loadScores():
@@ -101,7 +104,7 @@ def train(args):
 		print("{}/{} Correct.\tAccuracy = {}\n".format(correct,wrong,100*correct/(correct+wrong)))
 
 	true_scores,fake_scores = build()
-	print("\n")
+	#print("\n")
 
 	predictions(true_scores,fake_scores)
 	## sanity check by giving true scores only
