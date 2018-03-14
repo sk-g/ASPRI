@@ -158,3 +158,19 @@ Confusion Matrix on test set, GRU 512 + Dense:
 		accuracy = 95.49014801948017
 
 __________________________________
+Confusion Matrix on train set,  128 ED + CNN + 3xLSTM(12) + Dense 16 + BN + Dense:
+		true negatives = 37263
+		false positives = 9133
+		false negatives = 391
+		true positives = 172169
+		accuracy = 95.65026763367983
+
+__________________________________
+Confusion Matrix on train set, 128 ED + CNN + 3xLSTM(12) + Dense 16 + BN + Dense:
+		true negatives = 16035
+		false positives = 4034
+		false negatives = 217
+		true positives = 73553
+		accuracy = 95.46990057438805
+
+__________________________________

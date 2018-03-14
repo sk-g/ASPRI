@@ -1,18 +1,3 @@
-# Copyright 2015 The TensorFlow Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-
 """Example / benchmark for building a PTB LSTM model.
 Trains the model described in:
 (Zaremba, et. al.) Recurrent Neural Network Regularization
@@ -40,10 +25,7 @@ The hyperparameters used in the model:
 - rnn_mode - the low level implementation of lstm cell: one of CUDNN,
              BASIC, or BLOCK, representing cudnn_lstm, basic_lstm, and
              lstm_block_cell classes.
-The data required for this example is in the data/ dir of the
-PTB dataset from Tomas Mikolov's webpage:
-$ wget http://www.fit.vutbr.cz/~imikolov/rnnlm/simple-examples.tgz
-$ tar xvf simple-examples.tgz
+
 To run:
 $ python ptb_word_lm.py --data_path=simple-examples/data/
 """
@@ -151,7 +133,7 @@ class PTBModel(object):
     tvars = tf.trainable_variables()
     grads, _ = tf.clip_by_global_norm(tf.gradients(self._cost, tvars),
                                       config.max_grad_norm)
-    optimizer = tf.train.AdamOptimizer(self._lr)
+    optimizer = tf.train.GradientDescentOptimizer(self._lr)
     self._train_op = optimizer.apply_gradients(
         zip(grads, tvars),
         global_step=tf.train.get_or_create_global_step())
@@ -312,16 +294,16 @@ class PTBModel(object):
 class SmallConfig(object):
   """Small config."""
   init_scale = 0.1#0.1
-  learning_rate = 0.09
+  learning_rate = 1
   max_grad_norm = 5
   num_layers = 2
-  num_steps = 20
-  hidden_size = 128#200
-  max_epoch = 4
+  num_steps = 32
+  hidden_size = 200#200
+  max_epoch = 2
   max_max_epoch = 10#13
-  keep_prob = 0.8
-  lr_decay = 0.63#0.5
-  batch_size = 20
+  keep_prob = 0.6
+  lr_decay = 0.7#0.5
+  batch_size = 32
   vocab_size = 24724
   rnn_mode = BLOCK
 
@@ -412,7 +394,7 @@ def run_epoch(session, model, eval_op=None, verbose=False,dump=False,what = None
              iters * model.input.batch_size * max(1, FLAGS.num_gpus) /
              (time.time() - start_time)))
   if dump:
-    pickle.dump(temp,open('perps_'+what,'wb'))
+    pickle.dump(temp,open(FLAGS.model+'_perps_'+what,'wb'))
   return np.exp(costs / iters)
 
 
