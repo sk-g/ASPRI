@@ -27,21 +27,6 @@ LOG_DIR = '/esat/spchtemp/scratch/lverwimp/tensorflow/logs/'
 
 
 def read_data(config, eval_config, TRAIN, VALID, TEST):
-	'''
-	Reads data from file.
-	Inputs:
-		config: dictionary containing configuration options (for training and validation)
-		eval_config: dictionary containing configuration options (for testing)
-		(TRAIN, VALID, TEST): tuple of booleans indicating whether we should train, validate and/or test
-	Returns:
-		config: dictionary containing configuration options (for training and validation)
-		eval_config: dictionary containing configuration options (for testing)
-		data: data object
-		train_data: training data mapped to indices (can be single list or tuple of lists depending on the type of model)
-		valid_data: validation data mapped to indices
-		test_data: test data mapped to indices
-		(TRAIN, VALID, TEST): tuple of booleans indicating whether we should train, validate and/or test
-	'''
 
 	if 'predict_next' in config or 'rescore' in config or 'debug2' in config:
 		TRAIN = False
@@ -284,17 +269,17 @@ def main(_):
 		pass
 
 	if 'log' in config:
-		log_file = LOG_DIR + os.path.basename(os.path.normpath(config['log'])) + '.log'
+		log_file = os.path.basename(os.path.normpath(config['log'])) + '.log'
 	else:
-		log_file = LOG_DIR + os.path.basename(os.path.normpath(config['save_path'])) + '.log'
+		log_file = os.path.basename(os.path.normpath(config['save_path'])) + '.log'
 	# if log file already exists, make a new version by adding a random number (to avoid overwriting)
-	#if os.path.isfile(log_file):
-	#	rand_num = round(random.random(),3)
-	#	log_file = log_file.strip('.log') + str(rand_num) + '.log'
+	if os.path.isfile(log_file):
+		rand_num = round(random.random(),3)
+		log_file = log_file.strip('.log') + str(rand_num) + '.log'
 
-	#fout = open(log_file,'w',0)
+	fout = open(log_file,'w')
 	# write both to standard output and log file
-	#sys.stdout = writer(sys.stdout, fout)
+	sys.stdout = writer(sys.stdout, fout)
 
 	print('configuration:')
 	for par,value in config.items():

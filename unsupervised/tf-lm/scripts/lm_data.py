@@ -23,7 +23,7 @@ def save_item_to_id(item_to_id, file, encoding):
 	Saves a item_to_id mapping to file.
 	'''
 	out = io.open(file, 'w', encoding=encoding)
-	for item, id_ in item_to_id.items():
+	for item, id_ in item_to_id.iteritems():
 		if item == '':
 			print('EMPTY ELEMENT')
 		if item == ' ':
@@ -75,11 +75,11 @@ class LMData(object):
 			valid_file = "valid_" + str(config['vocab']) + "k-unk.txt"
 			test_file = "test_" + str(config['vocab']) + "k-unk.txt"
 			self.train_path = os.path.join(config['data_path'], train_file)
-			#self.valid_path = os.path.join(config['data_path'], valid_file)
+			self.valid_path = os.path.join(config['data_path'], valid_file)
 			self.test_path = os.path.join(config['data_path'], test_file)
 		else:
 			self.train_path = os.path.join(config['data_path'], "11012018.txt")
-			#self.valid_path = os.path.join(config['data_path'], "11012018_f.txt")
+			self.valid_path = os.path.join(config['data_path'], "11012018_v.txt")
 			self.test_path = os.path.join(config['data_path'], "11012018_f.txt")
 
 		self.batch_size = config['batch_size']
@@ -1310,9 +1310,9 @@ class charNGramData(LMData):
 
 	def read_data(self):
 		# n-gram input: use data with full vcoabulary, where words are not converted to <UNK>
-		train_path_full_vocab = os.path.join(self.config['data_path'], "11012018.txt")
-		valid_path_full_vocab = os.path.join(self.config['data_path'], "11012018_f.txt")
-		test_path_full_vocab = os.path.join(self.config['data_path'], "11012018_t.txt")
+		train_path_full_vocab = os.path.join(self.config['data_path'], "train.txt")
+		valid_path_full_vocab = os.path.join(self.config['data_path'], "valid.txt")
+		test_path_full_vocab = os.path.join(self.config['data_path'], "test.txt")
 
 		if 'skipgram' in self.config:
 			if self.config['char_ngram'] != 2 or self.config['skipgram'] != 1:
@@ -1332,9 +1332,9 @@ class charNGramData(LMData):
 				valid_file = "valid_" + str(self.config['input_vocab']) + "k-unk.txt"
 				test_file = "test_" + str(self.config['input_vocab']) + "k-unk.txt"
 			else:
-				train_file = "11012018.txt"
-				valid_file = "11012018_f.txt"
-				test_file = "11012018_t.txt"
+				train_file = "train.txt"
+				valid_file = "valid.txt"
+				test_file = "test.txt"
 			input_train_path = os.path.join(self.config['data_path'], train_file)
 			input_valid_path = os.path.join(self.config['data_path'], valid_file)
 			input_test_path = os.path.join(self.config['data_path'], test_file)
